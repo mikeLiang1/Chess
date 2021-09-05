@@ -1,5 +1,8 @@
 import engine
 import pygame as p
+import os
+
+os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 p.init()
 WIDTH = HEIGHT = 512
@@ -18,8 +21,13 @@ def main():
     p.init()
     screen = p.display.set_mode((WIDTH,HEIGHT))
     clock = p.time.Clock()
+    screen.fill(p.Color("white"))
     gs = engine.gameState()
+    load_images()
+    
+    
 
+main()
 
 
 
