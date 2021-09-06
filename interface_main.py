@@ -1,7 +1,7 @@
 import engine
 import pygame as p
 import os
-import mainxd
+
 
 os.environ["SDL_VIDEODRIVER"]="x11"
 os.environ['SDL_AUDIODRIVER'] = 'dsp'

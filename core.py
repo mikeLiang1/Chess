@@ -34,7 +34,10 @@ class Piece():
 
     def __repr__(self): # TODO: Should be __str__
         class_name = type(self).__name__ 
-        return "{}{}".format(self.colour[0], class_name[0]) # Returns 2 letter string showing colour and piece type respectively
+        if class_name == 'Knight':
+            class_name = 'Night'
+            
+        return "'{}{}'".format(self.colour[0], class_name[0]) # Returns 2 letter string showing colour and piece type respectively
 
     # def __repr__(self):
     #     return "{}('{}', '{}', '{}')".format(type(self).__name__, self.colour, self.col, self.row)
