@@ -1,6 +1,6 @@
-import engine
 import pygame as p
 import os
+import core
 
 
 os.environ["SDL_VIDEODRIVER"]="x11"
@@ -24,12 +24,11 @@ def main():
     screen = p.display.set_mode((WIDTH,HEIGHT))
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
-    board = mainxd.chess_board
+    board = core.chess_board
    
     load_images()
     running = True
     selected_square = () # a tuple of selected square (row, column)
-    player_clicks = [] #cur players pervious clicks  
 
     while running:
         for event in p.event.get():
@@ -39,13 +38,35 @@ def main():
                 location = p.mouse.get_pos()
                 col = location[0]//SQ_SIZE
                 row = location[1]//SQ_SIZE
-                if selected_square == (row, col): # user has last clicked this square, we unlick
+                if selected_square == (): #first click
+                    if board[row][col] != "--": # only if i clicked on a piece i can move it
+                        selected_square = (row, col)  
+                                 
+                else: #second click
+                    if selected_square != (row,col):  
+                        
+                        board[selected_square[0]][selected_square[1]].pawn_move_cap(row, col)
                     selected_square = ()
                     player_clicks = []
-                else:    
-                    selected_square = (row, col)
-                    player_clicks.append(selected_square)
-                    #if player_clicks.len == 2: # players second click we make move
+
+                # if selected_square == (row, col): # user has last clicked this square, we unlick
+                #     selected_square = ()
+                #     player_clicks = []
+                   
+                # else: # clicked elsewhere   
+                #     selected_square = (row, col)
+                #     print(board[row][col], selected_square)
+                #     player_clicks.append(selected_square)
+                # if len(player_clicks) == 2: # players second click we make move
+                #     piece = player_clicks[0]
+                #     target = player_clicks[1]
+                    
+                #     if board[piece[0]][piece[1]] != "--": #if is piece
+                #         board[piece[0]][piece[1]].pawn_move_cap(target[0], target[1])
+                #     selected_sqaure = ()
+                #     player_clicks = []
+                   
+                        
 
                     
 
@@ -70,7 +91,7 @@ def draw_pieces(screen, board):
     for r in range(DIMENSION):
         for c in range(DIMENSION):
             piece = board[r][c]
-            print(repr(piece))
+            
             if piece != "--":
                 screen.blit(IMAGES[repr(piece)], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
