@@ -37,7 +37,7 @@ class Piece():
         if class_name == 'Knight':
             class_name = 'Night'
             
-        return "'{}{}'".format(self.colour[0], class_name[0]) # Returns 2 letter string showing colour and piece type respectively
+        return "{}{}".format(self.colour[0], class_name[0]) # Returns 2 letter string showing colour and piece type respectively
 
     # def __repr__(self):
     #     return "{}('{}', '{}', '{}')".format(type(self).__name__, self.colour, self.col, self.row)
@@ -133,7 +133,7 @@ class Pawn(Piece):
      
     
     # Ability to move white up by one, or down by one for black pieces (if nothing blocking)
-    def pawn_move_cap(self, target_row, target_col):
+    def move_cap(self, target_row, target_col):
 
         # TODO: Implement user input conditions for single row and double row advance 
 
@@ -215,7 +215,7 @@ class Queen(Piece):
 
                 self.piece_move_capture(target_row, target_col)
 
-    def queen_move_cap(self, target_row, target_col):
+    def move_cap(self, target_row, target_col):
 
         # Target square is a horizontal, vertical or diagonal
         self.rook_move_cap(target_row, target_col)
@@ -226,17 +226,21 @@ class Rook(Queen):
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
 
-class Bishop(Queen):
+    def move_cap(self, row, col):
+        self.rook_move_cap(row, col)
 
+class Bishop(Queen):
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
              
+    def move_cap(self, row, col):
+        self.bishop_move_cap(row, col)
 class Knight(Piece):
     
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
 
-    def knight_move_cap(self, target_row, target_col):
+    def move_cap(self, target_row, target_col):
 
         # L shape movement
         if abs(target_row - self.row) == 2 and abs(target_col - self.col) == 1:
@@ -247,14 +251,12 @@ class Knight(Piece):
 
             self.piece_move_capture(target_row, target_col)
 
-
-
 class King(Piece):
 
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
 
-    def king_move_cap(self, target_row, target_col):
+    def move_cap(self, target_row, target_col):
 
         # Left, right, up, down
         if abs(target_row - self.row) + abs(target_col - self.col) == 1:
@@ -305,6 +307,7 @@ wB2 = Bishop('white', 7, 5)
 wN2 = Knight('white', 7, 6)
 wR2 = Rook('white', 7, 7)
 
+
 # 8 by 8 2D array
 chess_board = [ 
 
@@ -316,9 +319,10 @@ chess_board = [
     [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
     [wP1, wP2, wP3, wP4, wP5, wP6, wP7, wP8],
     [wR1, wN1, wB1, wK, wQ, wB2, wN2, wR2]
-
 ]
-def cBoard():
-    return chess_board
+
+cur_turn = 'white'
+
+
 
 print_board(chess_board) 
