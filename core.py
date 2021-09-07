@@ -6,6 +6,7 @@
 
 # 1.3) Special moves - Castling (both sides), pawn promotion, en pessant, pawn moves double ranks??
 # 1.31) CHECKMATE, STALEMATE, in check (should you be able to click on other pieces that can't stop the check?)
+
 # 1.32) Moving a piece on the same square ?!!?! 
 # 1.4) Undo function, log system, 
 
@@ -156,38 +157,6 @@ class Pawn(Piece):
 
                 self.piece_move_capture(target_row, target_col)
 
-# class Pawn(Piece): # TODO: Consider changing pawn code to use target square mechanism
-
-#     def __init__(self, colour, row, col):
-#         super().__init__(colour, row, col)
-
-#     # Ability to move white up by one, or down by one for black pieces (if nothing blocking)
-#     def pawn_move(self):
-
-#         # TODO: Implement user input conditions for single row and double row advance 
-
-#         calc = -1 # Default white case 
-#         if self.colour == 'black':
-#             calc = 1
-        
-#         # if self.colour == 'white':
-#         if chess_board[self.row + calc][self.col] == EMPTY: 
-#             self.row = self.row + calc
-#             chess_board[self.row][self.col] = chess_board[self.row - calc][self.col] # Allow pawn to move upward by one
-#             chess_board[self.row - calc][self.col] = EMPTY
-            
-#             # Ability for white pawn to move upward by two on starting square (if nothing blocking)
-#             if chess_board[self.row + calc][self.col] == EMPTY and self.row == 3.5 - 1.5 * calc: # Gives white or black's starting row
-#                 self.row = self.row + calc
-#                 chess_board[self.row][self.col] = chess_board[self.row - calc][self.col] # Allow pawn to move upward by one
-#                 chess_board[self.row - calc][self.col] = EMPTY
-
-#     def pawn_capture(self):
-
-#         calc = -1 # Default white case 
-#         if self.colour == 'black':
-#             calc = 1
-
 class Queen(Piece):
     
     def __init__(self, colour, row, col):
@@ -206,10 +175,10 @@ class Queen(Piece):
     def bishop_move_cap(self, target_row, target_col):
 
         # Target square is on either diagonal
-        if abs(target_row - self.row) == abs(target_col - self.col):
+        if abs(target_row - self.row) == abs(target_col - self.col): 
 
             # Check that no piece is blocking diagonal path
-            if self.piece_block_diag(target_row, target_col) is False:
+            if self.piece_block_diag(target_row, target_col) is False: 
 
                 self.piece_move_capture(target_row, target_col)
 
