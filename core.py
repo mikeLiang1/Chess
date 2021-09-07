@@ -145,6 +145,7 @@ class Pawn(Piece):
         # Pawn advance : Target square is one space forward, ensure it contains EMPTY
         if chess_board[target_row][target_col] == EMPTY and target_row == self.row + calc and target_col == self.col:
             self.piece_move_capture(target_row, target_col)
+            return True
         
         # Pawn double advance : Target square is two spaces forward, if on starting rank
         elif target_row == self.row + 2*calc and target_col == self.col and self.row == 3.5 - 2.5 * calc:
@@ -152,12 +153,15 @@ class Pawn(Piece):
             if chess_board[target_row][target_col] == EMPTY and chess_board[target_row - calc][target_col] == EMPTY:
 
                 self.piece_move_capture(target_row, target_col)
+                return True
 
         # Pawn diagonal capture : If target square is the one square diagonally forward (left and right)
         elif target_row == self.row + calc and (target_col == self.col + calc or target_col == self.col - calc):
             if chess_board[target_row][target_col] != EMPTY: 
 
                 self.piece_move_capture(target_row, target_col)
+                return True
+        return False
 
 class Queen(Piece):
     
@@ -173,6 +177,8 @@ class Queen(Piece):
             if self.piece_block_rowcol(target_row, target_col) is False:
 
                 self.piece_move_capture(target_row, target_col)
+                return True
+        return False
 
     def bishop_move_cap(self, target_row, target_col):
 
@@ -183,6 +189,8 @@ class Queen(Piece):
             if self.piece_block_diag(target_row, target_col) is False: 
 
                 self.piece_move_capture(target_row, target_col)
+                return True
+        return False
 
     def move_cap(self, target_row, target_col):
 
@@ -196,14 +204,14 @@ class Rook(Queen):
         super().__init__(colour, row, col)
 
     def move_cap(self, row, col):
-        self.rook_move_cap(row, col)
+        return self.rook_move_cap(row, col)
 
 class Bishop(Queen):
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
              
     def move_cap(self, row, col):
-        self.bishop_move_cap(row, col)
+        return self.bishop_move_cap(row, col)
 class Knight(Piece):
     
     def __init__(self, colour, row, col):
@@ -215,10 +223,13 @@ class Knight(Piece):
         if abs(target_row - self.row) == 2 and abs(target_col - self.col) == 1:
 
             self.piece_move_capture(target_row, target_col)
+            return True
 
         elif abs(target_row - self.row) == 1 and abs(target_col - self.col) == 2:
 
             self.piece_move_capture(target_row, target_col)
+            return True
+        return False
 
 class King(Piece):
 
@@ -231,11 +242,14 @@ class King(Piece):
         if abs(target_row - self.row) + abs(target_col - self.col) == 1:
             
             self.piece_move_capture(target_row, target_col)
+            return True
 
         # Diagonally - up left, up right, down left, down right
         elif abs(target_row - self.row) ==  abs(target_col - self.col) == 1:
             
             self.piece_move_capture(target_row, target_col)
+            return True
+        return False
 
     
 
@@ -243,8 +257,8 @@ class King(Piece):
 bR1 = Rook('black', 0, 0)
 bN1 = Knight('black', 0, 1)
 bB1 = Bishop('black', 0, 2)
-bK = King('black', 0, 3)
-bQ = Queen('black', 0, 4)
+bQ = Queen('black', 0, 3)
+bK = King('black', 0, 4)
 bB2 = Bishop('black', 0, 5)
 bN2 = Knight('black', 0, 6)
 bR2 = Rook('black', 0, 7)
@@ -270,8 +284,8 @@ wP8 = Pawn('white', 6, 7)
 wR1 = Rook('white', 7, 0)
 wN1 = Knight('white', 7, 1)
 wB1 = Bishop('white', 7, 2)
-wK = King('white', 7, 3)
-wQ = Queen('white', 7, 4)
+wQ = Queen('white', 7, 3)
+wK = King('white', 7, 4)
 wB2 = Bishop('white', 7, 5)
 wN2 = Knight('white', 7, 6)
 wR2 = Rook('white', 7, 7)
@@ -280,14 +294,14 @@ wR2 = Rook('white', 7, 7)
 # 8 by 8 2D array
 chess_board = [ 
 
-    [bR1, bN1, bB1, bK, bQ, bB2, bN2, bR2],
+    [bR1, bN1, bB1, bQ, bK, bB2, bN2, bR2],
     [bP1, bP2, bP3, bP4, bP5, bP6, bP7, bP8],
     [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
     [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
     [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
     [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
     [wP1, wP2, wP3, wP4, wP5, wP6, wP7, wP8],
-    [wR1, wN1, wB1, wK, wQ, wB2, wN2, wR2]
+    [wR1, wN1, wB1, wQ, wK, wB2, wN2, wR2]
 ]
 
 cur_turn = 'white'

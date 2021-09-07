@@ -40,49 +40,38 @@ def main():
                 row = location[1]//SQ_SIZE
                 if selected_square == (): #first click
                     if board[row][col] != "--" and board[row][col].colour == core.cur_turn: # only if i clicked on a piece i can move it        
-                        selected_square = (row, col)  
-                        highlight_squares(screen, selected_square)
+                        selected_square = (row, col)            
                                  
                 else: #second click
                     if selected_square != (row,col):  
-                        board[selected_square[0]][selected_square[1]].move_cap(row, col)
-                        if core.cur_turn == 'black':
-                            core.cur_turn = 'white'
-                        else:
-                            core.cur_turn = 'black'
-                    selected_square = ()
-                    player_clicks = []
-                    
 
-                # if selected_square == (row, col): # user has last clicked this square, we unlick
-                #     selected_square = ()
-                #     player_clicks = []
-                   
-                # else: # clicked elsewhere   
-                #     selected_square = (row, col)
-                #     print(board[row][col], selected_square)
-                #     player_clicks.append(selected_square)
-                # if len(player_clicks) == 2: # players second click we make move
-                #     piece = player_clicks[0]
-                #     target = player_clicks[1]
-                    
-                #     if board[piece[0]][piece[1]] != "--": #if is piece
-                #         board[piece[0]][piece[1]].pawn_move_cap(target[0], target[1])
-                #     selected_sqaure = ()
-                #     player_clicks = []
+                        if board[selected_square[0]][selected_square[1]].move_cap(row, col) == True:
+                            if core.cur_turn == 'black':
+                                core.cur_turn = 'white'
+                            else:
+                                core.cur_turn = 'black'
+                            animate_move(screen, board, clock, (row,col), selected_square, board[row][col])
+                    selected_square = ()
                                                               
-        draw_game_state(screen, board)
+        draw_game_state(screen, board, selected_square)
+        
         clock.tick(MAX_FPS)
         p.display.flip()
 
 # highlight sqaure selected and posibble moves
 def highlight_squares(screen, selected_sq):
-    print("in hiughlight squares")
+    if (selected_sq == ()):
+        return
     r,c = selected_sq
-    p.draw.rect(screen,p.Color("green"), p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
+    s = p.Surface((SQ_SIZE, SQ_SIZE))
+    s.set_alpha(100)
+    s.fill(p.Color('blue'))
+    screen.blit(s, (c*SQ_SIZE, r*SQ_SIZE))
+    
 
-def draw_game_state(screen, board):
+def draw_game_state(screen, board, selected_square):
     draw_board(screen)
+    highlight_squares(screen, selected_square)
     draw_pieces(screen, board)
 
 def draw_board(screen):
@@ -99,6 +88,21 @@ def draw_pieces(screen, board):
             
             if piece != "--":
                 screen.blit(IMAGES[repr(piece)], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
+
+def animate_move(screen, board, clock, target, start, piece):
+    
+    dr = target[0] - start[0]
+    dc = target[1] - start[1]
+    frames = 10
+    frame_count = (abs(dr) + abs(dc) * frames)
+    for frame in range(frame_count + 1):
+        r, c = (start[0] + dr*frame/frame_count, start[1] + dc*frame/frame_count)
+        draw_board(screen)
+        draw_pieces(screen, board)
+        print(piece)
+        screen.blit(IMAGES[repr(piece)], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE)) 
+        p.display.flip()
+        clock.tick(60)
 
 if __name__ == '__main__':
     main()
