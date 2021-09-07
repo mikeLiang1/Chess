@@ -39,15 +39,19 @@ def main():
                 col = location[0]//SQ_SIZE
                 row = location[1]//SQ_SIZE
                 if selected_square == (): #first click
-                    if board[row][col] != "--": # only if i clicked on a piece i can move it
+                    if board[row][col] != "--" and board[row][col].colour == core.cur_turn: # only if i clicked on a piece i can move it        
                         selected_square = (row, col)  
                                  
                 else: #second click
                     if selected_square != (row,col):  
-                        
-                        board[selected_square[0]][selected_square[1]].pawn_move_cap(row, col)
+                        board[selected_square[0]][selected_square[1]].move_cap(row, col)
+                        if core.cur_turn == 'black':
+                            core.cur_turn = 'white'
+                        else:
+                            core.cur_turn = 'black'
                     selected_square = ()
                     player_clicks = []
+                    
 
                 # if selected_square == (row, col): # user has last clicked this square, we unlick
                 #     selected_square = ()
@@ -65,16 +69,15 @@ def main():
                 #         board[piece[0]][piece[1]].pawn_move_cap(target[0], target[1])
                 #     selected_sqaure = ()
                 #     player_clicks = []
-                   
-                        
-
-                    
-
-        
+                                                              
         draw_game_state(screen, board)
         clock.tick(MAX_FPS)
         p.display.flip()
 
+# highlight sqaure selected and posibble moves
+def highlight_sqaures(screen, board, valid_moves, selected_sq):
+    if selected_sq != ():
+        r,c = selected_sq
 def draw_game_state(screen, board):
     draw_board(screen)
     
