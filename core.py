@@ -1,14 +1,15 @@
 # Planner
 # 1.0) Create chess board array, subclasses for colour and piece type, place in starting
 # 1.1) Possible moves - Each piece is unique
+# 2.0) Implement UI using pygame  (drawing board, drawing pieces, alternating square colours)
 
 # 1.2) Check mechanism -  Valid moves (all of the other player's next possible moves attack your king in new position)
+
 # 1.3) Special moves - Castling (both sides), pawn promotion, en pessant, pawn moves double ranks??
 # 1.31) CHECKMATE, STALEMATE
 # 1.32) Moving a piece on the same square ?!!?! 
 # 1.4) Undo function, log system, 
 
-# 2.0) Implement UI using pygame  (drawing board, drawing pieces, alternating square colours)
 # 2.1) Implement drag drop - moving pieces using cursor
 
 # 3.0) Plan out chess AI
