@@ -41,6 +41,7 @@ def main():
                 if selected_square == (): #first click
                     if board[row][col] != "--" and board[row][col].colour == core.cur_turn: # only if i clicked on a piece i can move it        
                         selected_square = (row, col)  
+                        highlight_squares(screen, selected_square)
                                  
                 else: #second click
                     if selected_square != (row,col):  
@@ -75,12 +76,13 @@ def main():
         p.display.flip()
 
 # highlight sqaure selected and posibble moves
-def highlight_sqaures(screen, board, valid_moves, selected_sq):
-    if selected_sq != ():
-        r,c = selected_sq
+def highlight_squares(screen, selected_sq):
+    print("in hiughlight squares")
+    r,c = selected_sq
+    p.draw.rect(screen,p.Color("green"), p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
+
 def draw_game_state(screen, board):
     draw_board(screen)
-    
     draw_pieces(screen, board)
 
 def draw_board(screen):
