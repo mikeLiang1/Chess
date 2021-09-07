@@ -1,14 +1,14 @@
 # Planner
 # 1.0) Create chess board array, subclasses for colour and piece type, place in starting
 # 1.1) Possible moves - Each piece is unique
-
+# 2.0) Implement UI using pygame  (drawing board, drawing pieces, alternating square colours)
 # 1.2) Check mechanism -  Valid moves (all of the other player's next possible moves attack your king in new position)
+
 # 1.3) Special moves - Castling (both sides), pawn promotion, en pessant, pawn moves double ranks??
-# 1.31) CHECKMATE, STALEMATE
+# 1.31) CHECKMATE, STALEMATE, in check (should you be able to click on other pieces that can't stop the check?)
 # 1.32) Moving a piece on the same square ?!!?! 
 # 1.4) Undo function, log system, 
 
-# 2.0) Implement UI using pygame  (drawing board, drawing pieces, alternating square colours)
 # 2.1) Implement drag drop - moving pieces using cursor
 
 # 3.0) Plan out chess AI
@@ -37,7 +37,7 @@ class Piece():
         if class_name == 'Knight':
             class_name = 'Night'
             
-        return "{}{}".format(self.colour[0], class_name[0]) # Returns 2 letter string showing colour and piece type respectively
+        return "'{}{}'".format(self.colour[0], class_name[0]) # Returns 2 letter string showing colour and piece type respectively
 
     # def __repr__(self):
     #     return "{}('{}', '{}', '{}')".format(type(self).__name__, self.colour, self.col, self.row)
@@ -54,8 +54,11 @@ class Piece():
     # Function that can capture and/or move
     def piece_move_capture(self, target_row, target_col):
         
+        # Checking mechanism : Implement a filter before potential move that returns information on whether your king is in check
+        # A check means that a piece is able to capture the other colour king on the next move
+
+
         # Ensure only capture a piece within our 8 x 8 array 
-        # TODO: Should assert be in inner function or outer function?
         assert (0 <= target_row and target_row <= DIMENSION - 1) 
         assert (0 <= target_col and target_row <= DIMENSION - 1)
 
@@ -80,13 +83,11 @@ class Piece():
             if self.row > target_row:
                 calc = -1
 
-            for i in range(self.row, target_row, calc):
+            for i in range(self.row + calc, target_row, calc):
 
                 if chess_board[i][self.col] is not EMPTY:  
 
-                    if i is not self.row: # Skip starting position
-
-                        return True
+                    return True
             
             return False
         
@@ -97,19 +98,32 @@ class Piece():
             if self.col > target_col:
                 calc = -1
             
-            for i in range(self.col, target_col, calc):
+            for i in range(self.col + calc, target_col, calc):
 
                 if chess_board[self.row][i] is not EMPTY:   
 
-                    if i is not self.col: # Skip starting position
-
-                        return True
+                    return True
 
             return False
 
     # Loops through squares in a diagonal, from current position to target position, returning True or False
     def piece_block_diag(self, target_row, target_col):
-        pass
+        
+        calc_row = 1
+        if self.row > target_row:
+            calc_row = -1 
+
+        calc_col = 1
+        if self.col > target_col:
+            calc_col = -1 
+
+        for i in range(1, abs(self.row - target_row)): # Skip starting position
+
+            if chess_board[self.row + i * calc_row][self.col + i * calc_col] is not EMPTY:  
+ 
+                return True
+        
+        return False
 
 ## Subclasses
 class Pawn(Piece): 
@@ -176,8 +190,8 @@ class Pawn(Piece):
 #         if self.colour == 'black':
 #             calc = 1
 
-class Rook(Piece):
-
+class Queen(Piece):
+    
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
 
@@ -185,30 +199,74 @@ class Rook(Piece):
                 
         # Target square is either in the same row or column
         if target_row == self.row or target_col == self.col:
-
+            
+            # Check that no piece is blocking horizontal/vertical path
             if self.piece_block_rowcol(target_row, target_col) is False:
 
                 self.piece_move_capture(target_row, target_col)
-        
 
-class Bishop(Piece):
+    def bishop_move_cap(self, target_row, target_col):
+
+        # Target square is on either diagonal
+        if abs(target_row - self.row) == abs(target_col - self.col):
+
+            # Check that no piece is blocking diagonal path
+            if self.piece_block_diag(target_row, target_col) is False:
+
+                self.piece_move_capture(target_row, target_col)
+
+    def queen_move_cap(self, target_row, target_col):
+
+        # Target square is a horizontal, vertical or diagonal
+        self.rook_move_cap(target_row, target_col)
+        self.bishop_move_cap(target_row, target_col)
+
+class Rook(Queen):
 
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
 
-    def bishop_move_cap(self, target_row, target_col):
+class Bishop(Queen):
 
-        pass 
-        # Target square is on either diagonal
-
-class Queen(Piece):
-    pass
-
+    def __init__(self, colour, row, col):
+        super().__init__(colour, row, col)
+             
 class Knight(Piece):
-    pass
+    
+    def __init__(self, colour, row, col):
+        super().__init__(colour, row, col)
+
+    def knight_move_cap(self, target_row, target_col):
+
+        # L shape movement
+        if abs(target_row - self.row) == 2 and abs(target_col - self.col) == 1:
+
+            self.piece_move_capture(target_row, target_col)
+
+        elif abs(target_row - self.row) == 1 and abs(target_col - self.col) == 2:
+
+            self.piece_move_capture(target_row, target_col)
+
+
 
 class King(Piece):
-    pass
+
+    def __init__(self, colour, row, col):
+        super().__init__(colour, row, col)
+
+    def king_move_cap(self, target_row, target_col):
+
+        # Left, right, up, down
+        if abs(target_row - self.row) + abs(target_col - self.col) == 1:
+            
+            self.piece_move_capture(target_row, target_col)
+
+        # Diagonally - up left, up right, down left, down right
+        elif abs(target_row - self.row) ==  abs(target_col - self.col) == 1:
+            
+            self.piece_move_capture(target_row, target_col)
+
+    
 
 # Creating all the pieces and placing them in their starting positions
 bR1 = Rook('black', 0, 0)
@@ -263,17 +321,4 @@ chess_board = [
 def cBoard():
     return chess_board
 
-
-# bP1.pawn_move_cap(3, 0)
-# bR1.rook_move_cap(2, 0)
-# bR1.rook_move_cap(2, 1)
-# bR1.rook_move_cap(4, 1)
-# bR1.rook_move_cap(4, 0)
-# bR1.rook_move_cap(0, 0)
-
 print_board(chess_board) 
-
-
-        
-
-
