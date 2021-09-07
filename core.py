@@ -60,8 +60,8 @@ class Piece():
 
 
         # Ensure only capture a piece within our 8 x 8 array 
-        assert (0 <= target_row and target_row <= DIMENSION - 1) 
-        assert (0 <= target_col and target_row <= DIMENSION - 1)
+        # assert (0 <= target_row and target_row <= DIMENSION - 1) 
+        # assert (0 <= target_col and target_row <= DIMENSION - 1)
 
         # Piece capture : Target piece can only be captured if object exists at location (not a string)
         # if not isinstance(chess_board[target_row][target_col], str):
