@@ -16,7 +16,7 @@
 # - - - - - - - - - - - - - - - - - - - - 
 
 DIMENSION = 8
-EMPTY = '--'
+EMPTY = "--"
 
 ## Functions
 # Function which prints each row at a time by rank, from white's perspective
@@ -26,7 +26,7 @@ def print_board(array):
          print(array[rank])
 
 ## Classes
-class Piece:
+class Piece():
 
     def __init__(self, colour, row, col):
         self.colour = colour
@@ -38,7 +38,7 @@ class Piece:
         if class_name == 'Knight':
             class_name = 'Night'
             
-        return "'{}{}'".format(self.colour[0], class_name[0]) # Returns 2 letter string showing colour and piece type respectively
+        return "{}{}".format(self.colour[0], class_name[0]) # Returns 2 letter string showing colour and piece type respectively
 
     # def __repr__(self):
     #     return "{}('{}', '{}', '{}')".format(type(self).__name__, self.colour, self.col, self.row)
@@ -259,6 +259,9 @@ chess_board = [
     [wR1, wN1, wB1, wK, wQ, wB2, wN2, wR2]
 
 ]
+def cBoard():
+    return chess_board
+
 
 # bP1.pawn_move_cap(3, 0)
 # bR1.rook_move_cap(2, 0)
