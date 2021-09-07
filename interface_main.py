@@ -44,8 +44,7 @@ def main():
                                  
                 else: #second click
                     if selected_square != (row,col):  
-                        
-                        board[selected_square[0]][selected_square[1]].pawn_move_cap(row, col)
+                        board[selected_square[0]][selected_square[1]].piece_move(row, col)
                     selected_square = ()
                     player_clicks = []
 
@@ -65,12 +64,7 @@ def main():
                 #         board[piece[0]][piece[1]].pawn_move_cap(target[0], target[1])
                 #     selected_sqaure = ()
                 #     player_clicks = []
-                   
-                        
-
-                    
-
-        
+                                                              
         draw_game_state(screen, board)
         clock.tick(MAX_FPS)
         p.display.flip()

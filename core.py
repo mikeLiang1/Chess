@@ -43,6 +43,7 @@ class Piece():
     #     return "{}('{}', '{}', '{}')".format(type(self).__name__, self.colour, self.col, self.row)
 
     # Moves piece at original square to the target square
+
     def piece_move(self, target_row, target_col):
         
         chess_board[target_row][target_col] = chess_board[self.row][self.col]
@@ -115,7 +116,8 @@ class Pawn(Piece):
 
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
-
+     
+    
     # Ability to move white up by one, or down by one for black pieces (if nothing blocking)
     def pawn_move_cap(self, target_row, target_col):
 
