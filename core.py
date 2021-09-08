@@ -16,16 +16,16 @@
 
 # 3.0) Plan out chess AI
 # - - - - - - - - - - - - - - - - - - - - 
+import copy
 
 DIMENSION = 8
 EMPTY = "--"
 
-## Functions
-# Function which prints each row at a time by rank, from white's perspective
-def print_board(array):
 
-    for rank in range(DIMENSION):
-         print(array[rank])
+cur_turn = 'white'
+
+## Functions
+
 
 ## Classes
 class Piece():
@@ -57,13 +57,30 @@ class Piece():
 
     # Function that can capture and/or move
     def piece_move_capture(self, target_row, target_col):
-               
-        if chess_board[target_row][target_col] == EMPTY or chess_board[target_row][target_col].colour != self.colour:
+        
+        # Checking mechanism : Implement a filter before potential move that returns information on whether your king is in check
+        # A check means that a piece is able to capture the other colour king on the next move
+
+
+        # Ensure only capture a piece within our 8 x 8 array 
+        # assert (0 <= target_row and target_row <= DIMENSION - 1) 
+        # assert (0 <= target_col and target_row <= DIMENSION - 1)
+
+        # Piece capture : Target piece can only be captured if object exists at location (not a string)
+        # if not isinstance(chess_board[target_row][target_col], str):
+                  
+        if chess_board[target_row][target_col] == EMPTY or chess_board[target_row][target_col].colour != self.colour: 
+            copy_array = [[],[],[],[],[],[],[],[]]
+            for i in range(DIMENSION):
+                copy_array[i] = copy.deepcopy(chess_board[i])
+
+            last_board_state.append(copy_array)
+            
             self.piece_move(target_row, target_col)
+            
             return True
         
         return False
-
 
     # Loops through squares in row or column from current position to target position (non inclusive), returning True or False
     def piece_block_rowcol(self, target_row, target_col):
@@ -286,6 +303,29 @@ class King(Piece):
             return self.piece_move_capture(target_row, target_col)
         return False
 
+cur_turn = 'white'
+
+def flip_sides():
+    global cur_turn
+    if cur_turn == 'white':
+        cur_turn = 'black'
+    else:
+        cur_turn = 'white'
+
+def undoMove():
+    global chess_board 
+    global last_board_state
+    if (last_board_state == []): # if empty
+        return
+    print(chess_board)
+    print("\n")
+    print(last_board_state)
+    for i in range(DIMENSION):
+        chess_board[i] = copy.deepcopy(last_board_state[-1][i])   
+    last_board_state.pop()
+    flip_sides()
+    
+    
     
 
 # Creating all the pieces and placing them in their starting positions
@@ -339,8 +379,6 @@ chess_board = [
     [wR1, wN1, wB1, wQ, wK, wB2, wN2, wR2]
 ]
 
-cur_turn = 'white'
+last_board_state = []
 
 
-
-print_board(chess_board) 
