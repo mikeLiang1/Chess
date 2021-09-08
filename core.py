@@ -67,14 +67,14 @@ class Piece():
 
         # Piece capture : Target piece can only be captured if object exists at location (not a string)
         # if not isinstance(chess_board[target_row][target_col], str):
-        if chess_board[target_row][target_col] is not EMPTY:
-            # Piece can only capture its opposing colour
-            if chess_board[target_row][target_col].colour != self.colour:
-                self.piece_move(target_row, target_col)
         
-        # Piece move : Target square must be an empty square
-        else:
+               
+        if chess_board[target_row][target_col] == EMPTY or chess_board[target_row][target_col].colour != self.colour:
             self.piece_move(target_row, target_col)
+            return True
+        
+        return False
+
 
     # Loops through squares in row or column from current position to target position (non inclusive), returning True or False
     def piece_block_rowcol(self, target_row, target_col):
@@ -148,23 +148,23 @@ class Pawn(Piece):
         
         # Pawn advance : Target square is one space forward, ensure it contains EMPTY
         if chess_board[target_row][target_col] == EMPTY and target_row == self.row + calc and target_col == self.col:
-            self.piece_move_capture(target_row, target_col)
-            return True
+            return self.piece_move_capture(target_row, target_col)
+            
         
         # Pawn double advance : Target square is two spaces forward, if on starting rank
         elif target_row == self.row + 2*calc and target_col == self.col and self.row == 3.5 - 2.5 * calc:
             # Ensure both positions are EMPTY
             if chess_board[target_row][target_col] == EMPTY and chess_board[target_row - calc][target_col] == EMPTY:
 
-                self.piece_move_capture(target_row, target_col)
-                return True
+                return self.piece_move_capture(target_row, target_col)
+                
 
         # Pawn diagonal capture : If target square is the one square diagonally forward (left and right)
         elif target_row == self.row + calc and (target_col == self.col + calc or target_col == self.col - calc):
             if chess_board[target_row][target_col] != EMPTY: 
 
-                self.piece_move_capture(target_row, target_col)
-                return True
+                return self.piece_move_capture(target_row, target_col)
+               
         return False
 
 class Queen(Piece):
@@ -179,9 +179,8 @@ class Queen(Piece):
             
             # Check that no piece is blocking horizontal/vertical path
             if self.piece_block_rowcol(target_row, target_col) is False:
-
-                self.piece_move_capture(target_row, target_col)
-                return True
+                return self.piece_move_capture(target_row, target_col)
+                
         return False
 
     def bishop_move_cap(self, target_row, target_col):
@@ -192,15 +191,13 @@ class Queen(Piece):
             # Check that no piece is blocking diagonal path
             if self.piece_block_diag(target_row, target_col) is False: 
 
-                self.piece_move_capture(target_row, target_col)
-                return True
+                return self.piece_move_capture(target_row, target_col)
         return False
 
     def move_cap(self, target_row, target_col):
 
         # Target square is a horizontal, vertical or diagonal
-        self.rook_move_cap(target_row, target_col)
-        self.bishop_move_cap(target_row, target_col)
+        return self.rook_move_cap(target_row, target_col) or self.bishop_move_cap(target_row, target_col)
 
 class Rook(Queen):
 
@@ -226,13 +223,11 @@ class Knight(Piece):
         # L shape movement
         if abs(target_row - self.row) == 2 and abs(target_col - self.col) == 1:
 
-            self.piece_move_capture(target_row, target_col)
-            return True
+            return self.piece_move_capture(target_row, target_col)
 
         elif abs(target_row - self.row) == 1 and abs(target_col - self.col) == 2:
 
-            self.piece_move_capture(target_row, target_col)
-            return True
+            return self.piece_move_capture(target_row, target_col)
         return False
 
 class King(Piece):
@@ -245,14 +240,12 @@ class King(Piece):
         # Left, right, up, down
         if abs(target_row - self.row) + abs(target_col - self.col) == 1:
             
-            self.piece_move_capture(target_row, target_col)
-            return True
+            return self.piece_move_capture(target_row, target_col)
 
         # Diagonally - up left, up right, down left, down right
         elif abs(target_row - self.row) ==  abs(target_col - self.col) == 1:
             
-            self.piece_move_capture(target_row, target_col)
-            return True
+            return self.piece_move_capture(target_row, target_col)
         return False
 
     
