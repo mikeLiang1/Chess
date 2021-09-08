@@ -34,6 +34,7 @@ class Piece():
         self.colour = colour
         self.row = row
         self.col = col
+        self.available_moves = []
 
     def __repr__(self): # TODO: Should be __str__
         class_name = type(self).__name__ 
@@ -56,18 +57,6 @@ class Piece():
 
     # Function that can capture and/or move
     def piece_move_capture(self, target_row, target_col):
-        
-        # Checking mechanism : Implement a filter before potential move that returns information on whether your king is in check
-        # A check means that a piece is able to capture the other colour king on the next move
-
-
-        # Ensure only capture a piece within our 8 x 8 array 
-        # assert (0 <= target_row and target_row <= DIMENSION - 1) 
-        # assert (0 <= target_col and target_row <= DIMENSION - 1)
-
-        # Piece capture : Target piece can only be captured if object exists at location (not a string)
-        # if not isinstance(chess_board[target_row][target_col], str):
-        
                
         if chess_board[target_row][target_col] == EMPTY or chess_board[target_row][target_col].colour != self.colour:
             self.piece_move(target_row, target_col)
@@ -128,60 +117,109 @@ class Piece():
         
         return False
 
+    # Loop through available moves list, if target square matches a tuple in available moves list, return move capture function
+    def move_cap(self, target_row, target_col):
+        
+        self.get_available_moves()
+
+        for i in self.available_moves:
+
+            if (target_row, target_col) == i:
+
+                return self.piece_move_capture(target_row, target_col)
+
+        return False
+        
 ## Subclasses
 class Pawn(Piece): 
 
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
 
-    def available_moves
-     
-    
-    # Ability to move white up by one, or down by one for black pieces (if nothing blocking)
-    def move_cap(self, target_row, target_col):
+    def get_available_moves(self):
 
-        # TODO: Implement user input conditions for single row and double row advance 
-
+        # Ability to move white up by one, or down by one for black pieces (if nothing blocking)
         calc = -1 # Default white case 
         if self.colour == 'black':
             calc = 1
-        
-        # Pawn advance : Target square is one space forward, ensure it contains EMPTY
-        if chess_board[target_row][target_col] == EMPTY and target_row == self.row + calc and target_col == self.col:
-            return self.piece_move_capture(target_row, target_col)
-            
+
+         # Pawn advance : Target square is one space forward, ensure it contains EMPTY
+        if 0 <= self.row + calc and self.row + calc <= DIMENSION - 1:
+
+            if chess_board[self.row + calc][self.col] == EMPTY:
+
+                self.available_moves.append((self.row + calc, self.col))
         
         # Pawn double advance : Target square is two spaces forward, if on starting rank
-        elif target_row == self.row + 2*calc and target_col == self.col and self.row == 3.5 - 2.5 * calc:
-            # Ensure both positions are EMPTY
-            if chess_board[target_row][target_col] == EMPTY and chess_board[target_row - calc][target_col] == EMPTY:
+        if 0 <= self.row + 2*calc and self.row + 2*calc <= DIMENSION - 1:  
 
-                return self.piece_move_capture(target_row, target_col)
+            if chess_board[self.row + 2*calc][self.col] == EMPTY and chess_board[self.row + calc][self.col] == EMPTY and self.row == 3.5 - 2.5 * calc:
+
+                self.available_moves.append((self.row + 2*calc, self.col))
+        
+        # Pawn diagonal capture : If target square is the one square diagonally forward (left)
+        if 0 <= self.row + calc and self.row + calc <= DIMENSION - 1 and 0 <= self.col + calc and self.col + calc <= DIMENSION - 1:
+
+            if chess_board[self.row + calc][self.col + calc] != self.colour and chess_board[self.row + calc][self.col + calc] != EMPTY:
+
+                self.available_moves.append((self.row + calc, self.col + calc))
+
+        # Pawn diagonal capture : Forward right
+        if 0 <= self.row + calc and self.row + calc <= DIMENSION - 1 and 0 <= self.col - calc and self.col - calc <= DIMENSION - 1:
+
+            if chess_board[self.row + calc][self.col - calc] != self.colour and chess_board[self.row + calc][self.col - calc] != EMPTY:
                 
-
-        # Pawn diagonal capture : If target square is the one square diagonally forward (left and right)
-        elif target_row == self.row + calc and (target_col == self.col + calc or target_col == self.col - calc):
-            if chess_board[target_row][target_col] != EMPTY: 
-
-                return self.piece_move_capture(target_row, target_col)
-               
-        return False
+                self.available_moves.append((self.row + calc, self.col - calc))
 
 class Queen(Piece):
     
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
 
-    def rook_move_cap(self, target_row, target_col):
-                
-        # Target square is either in the same row or column
-        if target_row == self.row or target_col == self.col:
+    def get_rook_available_moves(self):
+
+        # Looping vertically up and down the board from current position
+      
+        for i in range(self.row - 1, 0, -1):
             
-            # Check that no piece is blocking horizontal/vertical path
-            if self.piece_block_rowcol(target_row, target_col) is False:
-                return self.piece_move_capture(target_row, target_col)
-                
-        return False
+            if chess_board[i][self.col] is EMPTY:  
+
+                self.available_moves.append((i, self.col))
+                print(self.available_moves)
+
+            else: 
+                break        
+
+        for i in range(self.row + 1, DIMENSION - 1, 1):
+            
+            if chess_board[i][self.col] is EMPTY:  
+
+                self.available_moves.append((i, self.col))
+                print(self.available_moves)
+
+            else: 
+                break   
+
+        # Horizontal 
+        for i in range(self.col - 1, 0, -1):
+            
+            if chess_board[self.row][i] is EMPTY:  
+
+                self.available_moves.append((self.row, i))
+                print(self.available_moves)
+
+            else: 
+                break        
+
+        for i in range(self.col + 1, DIMENSION - 1, 1):
+            
+            if chess_board[self.row][i] is EMPTY:  
+
+                self.available_moves.append((self.row, i))
+                print(self.available_moves)
+
+            else: 
+                break  
 
     def bishop_move_cap(self, target_row, target_col):
 
@@ -194,18 +232,18 @@ class Queen(Piece):
                 return self.piece_move_capture(target_row, target_col)
         return False
 
-    def move_cap(self, target_row, target_col):
+    def get_available_moves(self):
 
         # Target square is a horizontal, vertical or diagonal
-        return self.rook_move_cap(target_row, target_col) or self.bishop_move_cap(target_row, target_col)
+        return self.get_rook_available_moves() and self.get_bishop_available_moves()
 
 class Rook(Queen):
 
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
 
-    def move_cap(self, row, col):
-        return self.rook_move_cap(row, col)
+    def get_available_moves(self):
+        return self.get_rook_available_moves()
 
 class Bishop(Queen):
     def __init__(self, colour, row, col):
