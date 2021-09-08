@@ -3,14 +3,16 @@
 # 1.1) Possible moves - Each piece is unique
 # 2.0) Implement UI using pygame  (drawing board, drawing pieces, alternating square colours)
 # 1.2) Check mechanism -  Valid moves (all of the other player's next possible moves attack your king in new position)
+# 1.32) Moving a piece on the same square ?!!?! 
+# 2.1) Implement drag drop - moving pieces using cursor
+
+# 2.0) Available moves function
 
 # 1.3) Special moves - Castling (both sides), pawn promotion, en pessant, pawn moves double ranks??
 # 1.31) CHECKMATE, STALEMATE, in check (should you be able to click on other pieces that can't stop the check?)
 
 # 1.32) Moving a piece on the same square ?!!?! 
 # 1.4) Undo function, log system, 
-
-# 2.1) Implement drag drop - moving pieces using cursor
 
 # 3.0) Plan out chess AI
 # - - - - - - - - - - - - - - - - - - - - 
@@ -131,6 +133,8 @@ class Pawn(Piece):
 
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
+
+    def available_moves
      
     
     # Ability to move white up by one, or down by one for black pieces (if nothing blocking)
