@@ -78,7 +78,7 @@ def highlight_squares(screen, selected_sq, moves, board):
         r, c = move
         s.fill(p.Color(0, 255, 255))
         if board[r][c] != core.EMPTY:
-            s.fill(p.Color(0,100, 100))
+            s.fill(p.Color(238, 29, 35))
         screen.blit(s, (c*SQ_SIZE, r*SQ_SIZE))
     
 
@@ -88,7 +88,7 @@ def draw_game_state(screen, board, selected_square, moves):
     draw_pieces(screen, board)
 
 def draw_board(screen):
-    colors = [p.Color("white"), p.Color("pink")]
+    colors = [p.Color("white"), p.Color(254, 211, 169)]
     for r in range(DIMENSION):
         for c in range(DIMENSION):
             color = colors[((r+c) %2)]

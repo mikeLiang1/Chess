@@ -89,9 +89,25 @@ class Piece():
 
             if (target_row, target_col) == i:
 
-                if (target_row == 7 or target_row == 0) and type(self).__name__ == "Pawn": # checking for promotion
+                if (target_row == 7 or target_row == 0) and isinstance(self, Pawn): # checking for promotion
                     return self.promote(target_row, target_col)
-
+                
+                if isinstance(self, King):
+                    print("king moving")
+                    if target_row == self.row and target_col == 2:
+                        self.castle(target_row, target_col, chess_board[self.row][self.col-4], 3)
+                        return True
+                    if target_row == self.row and target_col == 6:
+                        self.castle(target_row, target_col, chess_board[self.row][self.col+3], 5)
+                        return True
+                    #if self.piece_move_capture
+                    self.moved = True
+                
+                if isinstance(self, Rook):
+                    print("rook moved")
+                    self.moved = True
+                
+                
                 # 1) Run is_in_check function (checks if your OWN king is in check)
                 # 2) For the piece in question (clicked) , loop through available moves and save the ones which 'stop' the check (using is_in_check), either by capturing or blockinig
                 # 2.1 Dont open your own king up to check (run is_in_check again, take out invalid moves)
@@ -304,6 +320,7 @@ class Rook(Queen):
 
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
+        self.moved = False
 
     def get_available_moves(self):
         return self.get_rook_available_moves()
@@ -338,7 +355,7 @@ class King(Piece):
 
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
-        self.can_castle = True
+        self.moved = False
 
     def get_available_moves(self):
 
@@ -356,28 +373,28 @@ class King(Piece):
 
                     self.empty_or_enemy(k_possible_row, k_possible_col)
                 
+                
+                if self.moved == False:
+                    if k_possible_row == self.row and k_possible_col == 6: #right side castle
+                        rook = chess_board[self.row][self.col+3]
+                        if chess_board[self.row][self.col + 1] == EMPTY and chess_board[self.row][self.col+2] == EMPTY and isinstance(rook, Rook) == True and rook.moved == False:
+                            self.available_moves.append((self.row,6))                       
+                    elif k_possible_row == self.row and k_possible_col == 2: #left side castle        
+                        rook = chess_board[self.row][self.col-4]
+                        if chess_board[self.row][self.col - 1] == EMPTY and chess_board[self.row][self.col-2] == EMPTY and chess_board[self.row][self.col-3] == EMPTY and \
+                        isinstance(rook, Rook) == True and rook.moved == False:   
+                            self.available_moves.append((self.row, 2))   
+                        
+                    
+                
     
     # TODO: MIKE integrate castling code into available moves mechanism
     # def move_cap(self, target_row, target_col):
         
-    #     elif self.can_castle == True:
-    #         print("can castle")
-    #         if target_row == self.row and target_col == 6: #right side castle
-    #             if chess_board[self.row][self.col + 1] == EMPTY and chess_board[self.row][self.col+2] == EMPTY and isinstance(chess_board[self.row][self.col+3], Rook) == True:
-    #                 self.castle(target_row, target_col, chess_board[self.row][self.col+3], 5)
-    #                 self.can_castle = False
-    #                 return True
-    #         elif target_row == self.row and target_col == 2: # left side castle
-    #             if chess_board[self.row][self.col - 1] == EMPTY and chess_board[self.row][self.col-2] == EMPTY and chess_board[self.row][self.col-3] == EMPTY and \
-    #                 isinstance(chess_board[self.row][self.col-4], Rook) == True:
-    #                 self.castle(target_row, target_col, chess_board[self.row][self.col-4], 3)
-    #                 self.can_castle = False
-    #                 return True
-    #     return False
-
     def castle(self, target_row, target_col, rook, rook_col):
         print("castled")
         add_to_undo()
+        self.moved = True
         self.piece_move(target_row, target_col)
         rook.piece_move(target_row, rook_col)
 
