@@ -50,6 +50,8 @@ class Piece():
 
     def piece_move(self, target_row, target_col):
         
+        self.available_moves.clear()
+
         chess_board[target_row][target_col] = chess_board[self.row][self.col]
         chess_board[self.row][self.col] = EMPTY
         self.row = target_row
@@ -138,6 +140,8 @@ class Piece():
     def move_cap(self, target_row, target_col):
         
         self.get_available_moves()
+        print(self.available_moves)
+        # print(self.row, self.col)
 
         for i in self.available_moves:
 
@@ -197,46 +201,68 @@ class Queen(Piece):
 
         # Looping vertically up and down the board from current position
       
-        for i in range(self.row - 1, 0, -1):
+        for i in range(self.row - 1, -1, -1): # Range function doesn't include the end range number, so its -1 not 0
             
             if chess_board[i][self.col] is EMPTY:  
 
                 self.available_moves.append((i, self.col))
-                print(self.available_moves)
 
             else: 
+                # If first non EMPTY square is opposite colour, add the potentially capture square to available moves
+                if chess_board[i][self.col].colour != self.colour:
+
+                    self.available_moves.append((i, self.col))
+
+                print(self.available_moves)
+                 # Rook doesn't move through pieces
                 break        
 
-        for i in range(self.row + 1, DIMENSION - 1, 1):
+        for i in range(self.row + 1, DIMENSION, 1):
             
             if chess_board[i][self.col] is EMPTY:  
 
                 self.available_moves.append((i, self.col))
-                print(self.available_moves)
 
             else: 
-                break   
+                if chess_board[i][self.col].colour != self.colour:
+
+                    self.available_moves.append((i, self.col))
+
+                print(self.available_moves)
+                break    
 
         # Horizontal 
-        for i in range(self.col - 1, 0, -1):
+        for i in range(self.col - 1, -1, -1):
             
             if chess_board[self.row][i] is EMPTY:  
 
                 self.available_moves.append((self.row, i))
-                print(self.available_moves)
 
             else: 
-                break        
+                if chess_board[self.row][i].colour != self.colour:
 
-        for i in range(self.col + 1, DIMENSION - 1, 1):
+                    self.available_moves.append((self.row, i))
+
+                print(self.available_moves)
+                break         
+
+        for i in range(self.col + 1, DIMENSION, 1):
             
             if chess_board[self.row][i] is EMPTY:  
 
                 self.available_moves.append((self.row, i))
-                print(self.available_moves)
 
             else: 
-                break  
+                if chess_board[self.row][i].colour != self.colour:
+
+                    self.available_moves.append((self.row, i))
+
+                print(self.available_moves)
+                break    
+
+    def get_bishop_available_moves(self):
+
+        
 
     def bishop_move_cap(self, target_row, target_col):
 
@@ -266,8 +292,9 @@ class Bishop(Queen):
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
              
-    def move_cap(self, row, col):
-        return self.bishop_move_cap(row, col)
+    def get_available_moves(self):
+        return self.get_bishop_available_moves()
+
 class Knight(Piece):
     
     def __init__(self, colour, row, col):
