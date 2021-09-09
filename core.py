@@ -36,6 +36,7 @@ class Piece():
         self.colour = colour
         self.row = row
         self.col = col
+        self.moved = False
         self.available_moves = []
 
     def __repr__(self): # TODO: Should be __str__
@@ -56,6 +57,7 @@ class Piece():
         chess_board[self.row][self.col] = EMPTY
         self.row = target_row
         self.col = target_col 
+        self.moved = True
 
     # Function that can capture and/or move
     def piece_move_capture(self, target_row, target_col):
@@ -70,6 +72,8 @@ class Piece():
                   
         if chess_board[target_row][target_col] == EMPTY or chess_board[target_row][target_col].colour != self.colour: 
             add_to_undo()
+
+            self.moved = True
             
             self.piece_move(target_row, target_col)
             
@@ -101,12 +105,7 @@ class Piece():
                         self.castle(target_row, target_col, chess_board[self.row][self.col+3], 5)
                         return True
                     #if self.piece_move_capture
-                    self.moved = True
-                
-                if isinstance(self, Rook):
-                    print("rook moved")
-                    self.moved = True
-                
+                    
                 
                 # 1) Run is_in_check function (checks if your OWN king is in check)
                 # 2) For the piece in question (clicked) , loop through available moves and save the ones which 'stop' the check (using is_in_check), either by capturing or blockinig
@@ -198,11 +197,7 @@ class Pawn(Piece):
 
     def promote(self, target_row, target_col):
         if chess_board[target_row][target_col] == EMPTY or chess_board[target_row][target_col].colour != self.colour:
-            copy_array = [[],[],[],[],[],[],[],[]]
-            for i in range(DIMENSION):
-                copy_array[i] = copy.deepcopy(chess_board[i])
-
-            last_board_state.append(copy_array)
+            add_to_undo()
             chess_board[self.row][self.col] = EMPTY
             chess_board[target_row][target_col] = Queen(self.colour, target_row, target_col)
             
@@ -320,7 +315,6 @@ class Rook(Queen):
 
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
-        self.moved = False
 
     def get_available_moves(self):
         return self.get_rook_available_moves()
@@ -355,7 +349,6 @@ class King(Piece):
 
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
-        self.moved = False
 
     def get_available_moves(self):
 
@@ -385,16 +378,10 @@ class King(Piece):
                         isinstance(rook, Rook) == True and rook.moved == False:   
                             self.available_moves.append((self.row, 2))   
                         
-                    
-                
-    
-    # TODO: MIKE integrate castling code into available moves mechanism
-    # def move_cap(self, target_row, target_col):
         
     def castle(self, target_row, target_col, rook, rook_col):
         print("castled")
         add_to_undo()
-        self.moved = True
         self.piece_move(target_row, target_col)
         rook.piece_move(target_row, rook_col)
 
