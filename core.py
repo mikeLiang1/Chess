@@ -159,15 +159,6 @@ class Pawn(Piece):
         calc = -1 # Default white case 
         if self.colour == 'black':
             calc = 1
-<<<<<<< HEAD
-        
-        # Pawn advance : Target square is one space forward, ensure it contains EMPTY
-        if chess_board[target_row][target_col] == EMPTY and target_row == self.row + calc and target_col == self.col:
-            if target_row == 0 or target_row == 7: # promoting pawn
-                return self.promote(target_row, target_col)
-            return self.piece_move_capture(target_row, target_col)
-            
-=======
 
          # Pawn advance : Target square is one space forward, ensure it contains EMPTY
         if 0 <= self.row + calc and self.row + calc <= DIMENSION - 1:
@@ -175,25 +166,16 @@ class Pawn(Piece):
             if chess_board[self.row + calc][self.col] == EMPTY:
 
                 self.available_moves.append((self.row + calc, self.col))
->>>>>>> 9de6a8ab87276d19e947a95a98f9a116ed7abdae
         
         # Pawn double advance : Target square is two spaces forward, if on starting rank
         if 0 <= self.row + 2*calc and self.row + 2*calc <= DIMENSION - 1:  
 
             if chess_board[self.row + 2*calc][self.col] == EMPTY and chess_board[self.row + calc][self.col] == EMPTY and self.row == 3.5 - 2.5 * calc:
 
-<<<<<<< HEAD
-        # Pawn diagonal capture : If target square is the one square diagonally forward (left and right)
-        elif target_row == self.row + calc and (target_col == self.col + calc or target_col == self.col - calc):
-            if chess_board[target_row][target_col] != EMPTY: 
-                if target_row == 0 or target_row == 7: # promoting pawn
-                    return self.promote(target_row, target_col)
-=======
                 self.available_moves.append((self.row + 2*calc, self.col))
         
         # Pawn diagonal capture : If target square is the one square diagonally forward (left)
         if 0 <= self.row + calc and self.row + calc <= DIMENSION - 1 and 0 <= self.col + calc and self.col + calc <= DIMENSION - 1:
->>>>>>> 9de6a8ab87276d19e947a95a98f9a116ed7abdae
 
             if chess_board[self.row + calc][self.col + calc] != self.colour and chess_board[self.row + calc][self.col + calc] != EMPTY:
 
@@ -290,7 +272,6 @@ class Queen(Piece):
                 print(self.available_moves)
                 break    
 
-    def get_bishop_available_moves(self):
 
         
 
@@ -315,16 +296,8 @@ class Rook(Queen):
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
 
-<<<<<<< HEAD
-    def move_cap(self, row, col):
-        if self.rook_move_cap(row, col) == True:
-            wK.can_castle = False
-            return True
-        return True
-=======
     def get_available_moves(self):
         return self.get_rook_available_moves()
->>>>>>> 9de6a8ab87276d19e947a95a98f9a116ed7abdae
 
 class Bishop(Queen):
     def __init__(self, colour, row, col):
@@ -386,7 +359,7 @@ class King(Piece):
                     self.can_castle = False
                     return True
         return False
-        
+
     def castle(self, target_row, target_col, rook, rook_col):
         print("castled")
         add_to_undo()
