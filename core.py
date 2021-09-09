@@ -5,14 +5,14 @@
 # 1.2) Check mechanism -  Valid moves (all of the other player's next possible moves attack your king in new position)
 # 1.32) Moving a piece on the same square ?!!?! 
 # 2.1) Implement drag drop - moving pieces using cursor
+# 1.4) Undo function, log system, 
+# 1.32) Moving a piece on the same square ?!!?! 
 
 # 2.0) Available moves function
-
 # 1.3) Special moves - Castling (both sides), pawn promotion, en pessant, pawn moves double ranks??
+
 # 1.31) CHECKMATE, STALEMATE, in check (should you be able to click on other pieces that can't stop the check?)
 
-# 1.32) Moving a piece on the same square ?!!?! 
-# 1.4) Undo function, log system, 
 
 # 3.0) Plan out chess AI
 # - - - - - - - - - - - - - - - - - - - - 
@@ -80,65 +80,14 @@ class Piece():
         
         return False
 
-    # Loops through squares in row or column from current position to target position (non inclusive), returning True or False
-    def piece_block_rowcol(self, target_row, target_col):
-        
-        # Vertical movement 
-        if self.col == target_col:
-            
-            calc = 1
-            if self.row > target_row:
-                calc = -1
-
-            for i in range(self.row + calc, target_row, calc):
-
-                if chess_board[i][self.col] is not EMPTY:  
-
-                    return True
-            
-            return False
-        
-        # Horizontal movement
-        elif self.row == target_row:
-
-            calc = 1
-            if self.col > target_col:
-                calc = -1
-            
-            for i in range(self.col + calc, target_col, calc):
-
-                if chess_board[self.row][i] is not EMPTY:   
-
-                    return True
-
-            return False
-
-    # Loops through squares in a diagonal, from current position to target position, returning True or False
-    def piece_block_diag(self, target_row, target_col):
-        
-        calc_row = 1
-        if self.row > target_row:
-            calc_row = -1 
-
-        calc_col = 1
-        if self.col > target_col:
-            calc_col = -1 
-
-        for i in range(1, abs(self.row - target_row)): # Skip starting position
-
-            if chess_board[self.row + i * calc_row][self.col + i * calc_col] is not EMPTY:  
- 
-                return True
-        
-        return False
-
     # Loop through available moves list, if target square matches a tuple in available moves list, return move capture function
+    # TODO: Changge move_cap function name
     def move_cap(self, target_row, target_col):
         
-        ava = copy.deepcopy(self.available_moves)
+        curr_available_moves = copy.deepcopy(self.available_moves)
         self.available_moves.clear()
-        print(ava)
-        for i in ava:
+        
+        for i in curr_available_moves:
 
             if (target_row, target_col) == i:
                 if (target_row == 7 or target_row == 0) and type(self).__name__ == "Pawn": # checking for promotion
@@ -177,16 +126,20 @@ class Pawn(Piece):
         # Pawn diagonal capture : If target square is the one square diagonally forward (left)
         if 0 <= self.row + calc and self.row + calc <= DIMENSION - 1 and 0 <= self.col + calc and self.col + calc <= DIMENSION - 1:
 
-            if chess_board[self.row + calc][self.col + calc] != self.colour and chess_board[self.row + calc][self.col + calc] != EMPTY:
+            if chess_board[self.row + calc][self.col + calc] != EMPTY:
 
-                self.available_moves.append((self.row + calc, self.col + calc))
+                if chess_board[self.row + calc][self.col + calc].colour != self.colour:
+
+                    self.available_moves.append((self.row + calc, self.col + calc))
 
         # Pawn diagonal capture : Forward right
         if 0 <= self.row + calc and self.row + calc <= DIMENSION - 1 and 0 <= self.col - calc and self.col - calc <= DIMENSION - 1:
 
-            if chess_board[self.row + calc][self.col - calc] != self.colour and chess_board[self.row + calc][self.col - calc] != EMPTY:
+            if chess_board[self.row + calc][self.col - calc] != EMPTY:
+
+                if chess_board[self.row + calc][self.col - calc].colour != self.colour:
                 
-                self.available_moves.append((self.row + calc, self.col - calc))
+                    self.available_moves.append((self.row + calc, self.col - calc))
 
     def promote(self, target_row, target_col):
         if chess_board[target_row][target_col] == EMPTY or chess_board[target_row][target_col].colour != self.colour:
@@ -204,6 +157,8 @@ class Pawn(Piece):
 
 
 class Queen(Piece):
+
+    # TODO: Put rook and bishop available moves into functiions (shorten code)
     
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
@@ -224,7 +179,6 @@ class Queen(Piece):
 
                     self.available_moves.append((i, self.col))
 
-                print(self.available_moves)
                  # Rook doesn't move through pieces
                 break        
 
@@ -239,7 +193,6 @@ class Queen(Piece):
 
                     self.available_moves.append((i, self.col))
 
-                print(self.available_moves)
                 break    
 
         # Horizontal 
@@ -254,7 +207,6 @@ class Queen(Piece):
 
                     self.available_moves.append((self.row, i))
 
-                print(self.available_moves)
                 break         
 
         for i in range(self.col + 1, DIMENSION, 1):
@@ -268,27 +220,83 @@ class Queen(Piece):
 
                     self.available_moves.append((self.row, i))
 
-                print(self.available_moves)
                 break    
 
-
+    def get_bishop_available_moves(self):
         
+        # Upwards right
+        i = 1
+        while (self.row - i > -1 and self.col + i < DIMENSION):
 
-    def bishop_move_cap(self, target_row, target_col):
+            if chess_board[self.row - i][self.col + i] is EMPTY:
 
-        # Target square is on either diagonal
-        if abs(target_row - self.row) == abs(target_col - self.col): 
+                self.available_moves.append((self.row - i, self.col + i))
 
-            # Check that no piece is blocking diagonal path
-            if self.piece_block_diag(target_row, target_col) is False: 
+            else:
+                if chess_board[self.row - i][self.col + i].colour != self.colour:
 
-                return self.piece_move_capture(target_row, target_col)
-        return False
+                    self.available_moves.append((self.row - i, self.col + i))
+
+                break    
+
+            i += 1
+
+        # Upwards left
+        i = 1
+        while (self.row - i > -1 and self.col - i > -1):
+
+            if chess_board[self.row - i][self.col - i] is EMPTY:
+
+                self.available_moves.append((self.row - i, self.col - i))
+
+            else:
+                if chess_board[self.row - i][self.col - i].colour != self.colour:
+
+                    self.available_moves.append((self.row - i, self.col - i))
+
+                break    
+
+            i += 1
+
+        # Downwards left
+        i = 1
+        while (self.row + i < DIMENSION and self.col - i > -1):
+
+            if chess_board[self.row + i][self.col - i] is EMPTY:
+
+                self.available_moves.append((self.row + i, self.col - i))
+
+            else:
+                if chess_board[self.row + i][self.col - i].colour != self.colour:
+
+                    self.available_moves.append((self.row + i, self.col - i))
+
+                break    
+
+            i += 1
+
+        # Downwards right
+        i = 1
+        while (self.row + i < DIMENSION and self.col + i < DIMENSION):
+
+            if chess_board[self.row + i][self.col + i] is EMPTY:
+
+                self.available_moves.append((self.row + i, self.col + i))
+
+            else:
+                if chess_board[self.row + i][self.col + i].colour != self.colour:
+
+                    self.available_moves.append((self.row + i, self.col + i))
+
+                break    
+
+            i += 1
+
 
     def get_available_moves(self):
 
         # Target square is a horizontal, vertical or diagonal
-        return self.get_rook_available_moves() and self.get_bishop_available_moves()
+        return self.get_rook_available_moves() or self.get_bishop_available_moves()
 
 class Rook(Queen):
 
@@ -310,17 +318,24 @@ class Knight(Piece):
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
 
-    def move_cap(self, target_row, target_col):
+    # def get_available_moves(self):
 
-        # L shape movement
-        if abs(target_row - self.row) == 2 and abs(target_col - self.col) == 1:
+    #     possible_row = 0
+    #     possible_col = 0
 
-            return self.piece_move_capture(target_row, target_col)
 
-        elif abs(target_row - self.row) == 1 and abs(target_col - self.col) == 2:
+    #     # L shape movement
+    #     if abs(possible_row - self.row) == 2 and abs(possible_col - self.col) == 1:
 
-            return self.piece_move_capture(target_row, target_col)
-        return False
+    #         # if chess_board[self.row + calc][self.col + calc] != EMPTY:
+
+    #         #     if chess_board[self.row + calc][self.col + calc].colour != self.colour:
+
+    #         #         self.available_moves.append((self.row + calc, self.col + calc))
+
+    #     if abs(possible_row - self.row) == 1 and abs(possible_col - self.col) == 2:
+    #         pass
+    #     return False
 
 class King(Piece):
 
