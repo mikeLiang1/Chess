@@ -50,7 +50,6 @@ class Piece():
 
     def piece_move(self, target_row, target_col):
         
-        self.available_moves.clear()
 
         chess_board[target_row][target_col] = chess_board[self.row][self.col]
         chess_board[self.row][self.col] = EMPTY
@@ -70,6 +69,7 @@ class Piece():
 
         # Piece capture : Target piece can only be captured if object exists at location (not a string)
         # if not isinstance(chess_board[target_row][target_col], str):
+        
                   
         if chess_board[target_row][target_col] == EMPTY or chess_board[target_row][target_col].colour != self.colour: 
             add_to_undo()
@@ -77,6 +77,7 @@ class Piece():
             self.piece_move(target_row, target_col)
             
             return True
+        
         
         return False
 
@@ -135,11 +136,11 @@ class Piece():
     # Loop through available moves list, if target square matches a tuple in available moves list, return move capture function
     def move_cap(self, target_row, target_col):
         
-        self.get_available_moves()
-        print(self.available_moves)
-        # print(self.row, self.col)
-
-        for i in self.available_moves:
+        ava = copy.deepcopy(self.available_moves)
+        self.available_moves.clear()
+        print(ava)
+        
+        for i in ava:
 
             if (target_row, target_col) == i:
 

@@ -25,7 +25,7 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     board = core.chess_board
-   
+    moves = []
     load_images()
     running = True
     selected_square = () # a tuple of selected square (row, column)
@@ -44,22 +44,27 @@ def main():
                 row = location[1]//SQ_SIZE
                 if selected_square == (): #first click
                     if board[row][col] != "--" and board[row][col].colour == core.cur_turn: # only if i clicked on a piece i can move it        
-                        selected_square = (row, col)                             
+                        selected_square = (row, col)    
+                        board[row][col].get_available_moves()  
+                        moves = board[row][col].available_moves    
+                        print(moves)                   
                 else: #second click
                     if selected_square != (row,col):  
 
                         if board[selected_square[0]][selected_square[1]].move_cap(row, col) == True:  
                             core.flip_sides()                         
                             animate_move(screen, board, clock, (row,col), selected_square, board[row][col])
-                            
+
+                    else:
+                        board[selected_square[0]][selected_square[1]].available_moves.clear()     
                     selected_square = ()
                                                               
-        draw_game_state(screen, board, selected_square)
+        draw_game_state(screen, board, selected_square, moves)
         clock.tick(MAX_FPS)
         p.display.flip()
 
 # highlight sqaure selected and posibble moves
-def highlight_squares(screen, selected_sq):
+def highlight_squares(screen, selected_sq, moves):
     if (selected_sq == ()):
         return
     r,c = selected_sq
@@ -67,11 +72,17 @@ def highlight_squares(screen, selected_sq):
     s.set_alpha(100)
     s.fill(p.Color('blue'))
     screen.blit(s, (c*SQ_SIZE, r*SQ_SIZE))
+
+    #highlight moves
+    for move in moves:
+        r, c = move
+        s.fill(p.Color(0, 255, 255))
+        screen.blit(s, (c*SQ_SIZE, r*SQ_SIZE))
     
 
-def draw_game_state(screen, board, selected_square):
+def draw_game_state(screen, board, selected_square, moves):
     draw_board(screen)
-    highlight_squares(screen, selected_square)
+    highlight_squares(screen, selected_square, moves)
     draw_pieces(screen, board)
 
 def draw_board(screen):
