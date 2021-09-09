@@ -50,7 +50,6 @@ class Piece():
 
     def piece_move(self, target_row, target_col):
         
-
         chess_board[target_row][target_col] = chess_board[self.row][self.col]
         chess_board[self.row][self.col] = EMPTY
         self.row = target_row
@@ -139,11 +138,11 @@ class Piece():
         ava = copy.deepcopy(self.available_moves)
         self.available_moves.clear()
         print(ava)
-        
         for i in ava:
 
             if (target_row, target_col) == i:
-
+                if (target_row == 7 or target_row == 0) and type(self).__name__ == "Pawn": # checking for promotion
+                    return self.promote(target_row, target_col)
                 return self.piece_move_capture(target_row, target_col)
 
         return False
@@ -198,7 +197,6 @@ class Pawn(Piece):
             last_board_state.append(copy_array)
             chess_board[self.row][self.col] = EMPTY
             chess_board[target_row][target_col] = Queen(self.colour, target_row, target_col)
-            print(chess_board[target_row][target_col])
             
             return True
         
