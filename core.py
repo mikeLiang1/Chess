@@ -59,10 +59,6 @@ class Piece():
 
     # Function that can capture and/or move
     def piece_move_capture(self, target_row, target_col):
-        
-        # Checking mechanism : Implement a filter before potential move that returns information on whether your king is in check
-        # A check means that a piece is able to capture the other colour king on the next move
-
 
         # Ensure only capture a piece within our 8 x 8 array 
         # assert (0 <= target_row and target_row <= DIMENSION - 1) 
@@ -96,8 +92,10 @@ class Piece():
                 if (target_row == 7 or target_row == 0) and type(self).__name__ == "Pawn": # checking for promotion
                     return self.promote(target_row, target_col)
 
-                # Run is_in_check function (checks if your OWN king is in check)
-                # 
+                # 1) Run is_in_check function (checks if your OWN king is in check)
+                # 2) For the piece in question (clicked) , loop through available moves and save the ones which 'stop' the check (using is_in_check), either by capturing or blockinig
+                # 2.1 Dont open your own king up to check (run is_in_check again, take out invalid moves)
+                # 3) Update the saved squares as the new available moves
 
                 return self.piece_move_capture(target_row, target_col)
 
@@ -132,6 +130,10 @@ class Piece():
                 self.available_moves.append((possible_row, possible_col))
 
             return False
+
+    # Loops through EVERY enemy piece's available moves and if any matches your king's square, you are in check
+    def is_in_check():
+        pass
         
 ## Subclasses
 class Pawn(Piece): 
@@ -357,20 +359,6 @@ class King(Piece):
     
     # TODO: MIKE integrate castling code into available moves mechanism
     # def move_cap(self, target_row, target_col):
-
-    #     # Left, right, up, down
-    #     if abs(target_row - self.row) + abs(target_col - self.col) == 1:
-            
-    #         if self.piece_move_capture(target_row, target_col) == True:
-    #             self.can_castle = False
-    #             return True
-
-    #     # Diagonally - up left, up right, down left, down right
-    #     elif abs(target_row - self.row) ==  abs(target_col - self.col) == 1:
-            
-    #         if self.piece_move_capture(target_row, target_col) == True:
-    #             self.can_castle = False              
-    #             return True
         
     #     elif self.can_castle == True:
     #         print("can castle")
