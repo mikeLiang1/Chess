@@ -5,14 +5,14 @@
 # 1.2) Check mechanism -  Valid moves (all of the other player's next possible moves attack your king in new position)
 # 1.32) Moving a piece on the same square ?!!?! 
 # 2.1) Implement drag drop - moving pieces using cursor
+# 1.4) Undo function, log system, 
+# 1.32) Moving a piece on the same square ?!!?! 
 
 # 2.0) Available moves function
-
 # 1.3) Special moves - Castling (both sides), pawn promotion, en pessant, pawn moves double ranks??
+
 # 1.31) CHECKMATE, STALEMATE, in check (should you be able to click on other pieces that can't stop the check?)
 
-# 1.32) Moving a piece on the same square ?!!?! 
-# 1.4) Undo function, log system, 
 
 # 3.0) Plan out chess AI
 # - - - - - - - - - - - - - - - - - - - - 
@@ -49,8 +49,6 @@ class Piece():
     # Moves piece at original square to the target square
 
     def piece_move(self, target_row, target_col):
-        
-        self.available_moves.clear()
 
         chess_board[target_row][target_col] = chess_board[self.row][self.col]
         chess_board[self.row][self.col] = EMPTY
@@ -137,16 +135,18 @@ class Piece():
         return False
 
     # Loop through available moves list, if target square matches a tuple in available moves list, return move capture function
+    # TODO: Changge move_cap function name
     def move_cap(self, target_row, target_col):
         
         self.get_available_moves()
-        print(self.available_moves)
-        # print(self.row, self.col)
 
-        for i in self.available_moves:
+        curr_available_moves = copy.deepcopy(self.available_moves)
+        self.available_moves.clear()
+
+        for i in curr_available_moves:
 
             if (target_row, target_col) == i:
-
+                
                 return self.piece_move_capture(target_row, target_col)
 
         return False
@@ -261,19 +261,9 @@ class Queen(Piece):
                 break    
 
     def get_bishop_available_moves(self):
-
         
-
-    def bishop_move_cap(self, target_row, target_col):
-
-        # Target square is on either diagonal
-        if abs(target_row - self.row) == abs(target_col - self.col): 
-
-            # Check that no piece is blocking diagonal path
-            if self.piece_block_diag(target_row, target_col) is False: 
-
-                return self.piece_move_capture(target_row, target_col)
-        return False
+        # Upwards right
+        while
 
     def get_available_moves(self):
 
