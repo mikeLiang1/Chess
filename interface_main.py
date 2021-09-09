@@ -111,8 +111,8 @@ def animate_move(screen, board, clock, target, start, piece):
         draw_board(screen)
         draw_pieces(screen, board)
         screen.blit(IMAGES[repr(piece)], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE)) 
-        p.display.flip()
-        clock.tick(60)
+        p.display.update()            
+        p.time.delay(100)
 
 if __name__ == '__main__':
     main()
