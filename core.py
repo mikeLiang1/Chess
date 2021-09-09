@@ -1,4 +1,6 @@
 # Planner
+
+# COMPLETED
 # 1.0) Create chess board array, subclasses for colour and piece type, place in starting
 # 1.1) Possible moves - Each piece is unique
 # 2.0) Implement UI using pygame  (drawing board, drawing pieces, alternating square colours)
@@ -7,14 +9,14 @@
 # 2.1) Implement drag drop - moving pieces using cursor
 # 1.4) Undo function, log system, 
 # 1.32) Moving a piece on the same square ?!!?! 
-
 # 2.0) Available moves function
-# 1.3) Special moves - Castling (both sides), pawn promotion, en pessant, pawn moves double ranks??
 
+# ONGOING
+# 1.3) Special moves - Castling (both sides), pawn promotion, en pessant, pawn moves double ranks??
 # 1.31) CHECKMATE, STALEMATE, in check (should you be able to click on other pieces that can't stop the check?)
 
-
-# 3.0) Plan out chess AI
+# FUTURE
+# 3.0) Basic chess AI
 # - - - - - - - - - - - - - - - - - - - - 
 import copy
 
@@ -57,10 +59,6 @@ class Piece():
 
     # Function that can capture and/or move
     def piece_move_capture(self, target_row, target_col):
-        
-        # Checking mechanism : Implement a filter before potential move that returns information on whether your king is in check
-        # A check means that a piece is able to capture the other colour king on the next move
-
 
         # Ensure only capture a piece within our 8 x 8 array 
         # assert (0 <= target_row and target_row <= DIMENSION - 1) 
@@ -90,11 +88,52 @@ class Piece():
         for i in curr_available_moves:
 
             if (target_row, target_col) == i:
+
                 if (target_row == 7 or target_row == 0) and type(self).__name__ == "Pawn": # checking for promotion
                     return self.promote(target_row, target_col)
+
+                # 1) Run is_in_check function (checks if your OWN king is in check)
+                # 2) For the piece in question (clicked) , loop through available moves and save the ones which 'stop' the check (using is_in_check), either by capturing or blockinig
+                # 2.1 Dont open your own king up to check (run is_in_check again, take out invalid moves)
+                # 3) Update the saved squares as the new available moves
+
                 return self.piece_move_capture(target_row, target_col)
 
         return False
+    
+    # For knights (one square)
+    def empty_or_enemy(self, possible_row, possible_col):
+
+        if chess_board[possible_row][possible_col] is EMPTY:
+
+            self.available_moves.append((possible_row, possible_col))
+
+        else:
+
+            if chess_board[possible_row][possible_col].colour != self.colour:
+
+                self.available_moves.append((possible_row, possible_col))
+
+    # For bishops and rooks (row, column or diagonals)
+    def loop_empty_or_enemy(self, possible_row, possible_col):
+
+        if chess_board[possible_row][possible_col] is EMPTY:
+
+            self.available_moves.append((possible_row, possible_col))
+
+            return True
+
+        else:
+
+            if chess_board[possible_row][possible_col].colour != self.colour:
+
+                self.available_moves.append((possible_row, possible_col))
+
+            return False
+
+    # Loops through EVERY enemy piece's available moves and if any matches your king's square, you are in check
+    def is_in_check():
+        pass
         
 ## Subclasses
 class Pawn(Piece): 
@@ -169,58 +208,45 @@ class Queen(Piece):
       
         for i in range(self.row - 1, -1, -1): # Range function doesn't include the end range number, so its -1 not 0
             
-            if chess_board[i][self.col] is EMPTY:  
+            keep_looping = self.loop_empty_or_enemy(i, self.col)
 
-                self.available_moves.append((i, self.col))
+            if keep_looping == False:
+                break
 
-            else: 
-                # If first non EMPTY square is opposite colour, add the potentially capture square to available moves
-                if chess_board[i][self.col].colour != self.colour:
+            # if chess_board[i][self.col] is EMPTY:  
 
-                    self.available_moves.append((i, self.col))
+            #     self.available_moves.append((i, self.col))
 
-                 # Rook doesn't move through pieces
-                break        
+            # else: 
+            #     # If first non EMPTY square is opposite colour, add the potentially capture square to available moves
+            #     if chess_board[i][self.col].colour != self.colour:
+
+            #         self.available_moves.append((i, self.col))
+
+            #      # Rook doesn't move through pieces
+            #     break        
 
         for i in range(self.row + 1, DIMENSION, 1):
             
-            if chess_board[i][self.col] is EMPTY:  
+            keep_looping = self.loop_empty_or_enemy(i, self.col)
 
-                self.available_moves.append((i, self.col))
-
-            else: 
-                if chess_board[i][self.col].colour != self.colour:
-
-                    self.available_moves.append((i, self.col))
-
-                break    
+            if keep_looping == False:
+                break
 
         # Horizontal 
         for i in range(self.col - 1, -1, -1):
             
-            if chess_board[self.row][i] is EMPTY:  
+            keep_looping = self.loop_empty_or_enemy(self.row, i)
 
-                self.available_moves.append((self.row, i))
-
-            else: 
-                if chess_board[self.row][i].colour != self.colour:
-
-                    self.available_moves.append((self.row, i))
-
-                break         
+            if keep_looping == False:
+                break     
 
         for i in range(self.col + 1, DIMENSION, 1):
             
-            if chess_board[self.row][i] is EMPTY:  
+            keep_looping = self.loop_empty_or_enemy(self.row, i)
 
-                self.available_moves.append((self.row, i))
-
-            else: 
-                if chess_board[self.row][i].colour != self.colour:
-
-                    self.available_moves.append((self.row, i))
-
-                break    
+            if keep_looping == False:
+                break
 
     def get_bishop_available_moves(self):
         
@@ -228,16 +254,10 @@ class Queen(Piece):
         i = 1
         while (self.row - i > -1 and self.col + i < DIMENSION):
 
-            if chess_board[self.row - i][self.col + i] is EMPTY:
+            keep_looping = self.loop_empty_or_enemy(self.row - i, self.col + i)
 
-                self.available_moves.append((self.row - i, self.col + i))
-
-            else:
-                if chess_board[self.row - i][self.col + i].colour != self.colour:
-
-                    self.available_moves.append((self.row - i, self.col + i))
-
-                break    
+            if keep_looping == False:
+                break
 
             i += 1
 
@@ -245,16 +265,10 @@ class Queen(Piece):
         i = 1
         while (self.row - i > -1 and self.col - i > -1):
 
-            if chess_board[self.row - i][self.col - i] is EMPTY:
+            keep_looping = self.loop_empty_or_enemy(self.row - i, self.col - i)
 
-                self.available_moves.append((self.row - i, self.col - i))
-
-            else:
-                if chess_board[self.row - i][self.col - i].colour != self.colour:
-
-                    self.available_moves.append((self.row - i, self.col - i))
-
-                break    
+            if keep_looping == False:
+                break
 
             i += 1
 
@@ -262,16 +276,10 @@ class Queen(Piece):
         i = 1
         while (self.row + i < DIMENSION and self.col - i > -1):
 
-            if chess_board[self.row + i][self.col - i] is EMPTY:
+            keep_looping = self.loop_empty_or_enemy(self.row + i, self.col - i)
 
-                self.available_moves.append((self.row + i, self.col - i))
-
-            else:
-                if chess_board[self.row + i][self.col - i].colour != self.colour:
-
-                    self.available_moves.append((self.row + i, self.col - i))
-
-                break    
+            if keep_looping == False:
+                break
 
             i += 1
 
@@ -279,16 +287,10 @@ class Queen(Piece):
         i = 1
         while (self.row + i < DIMENSION and self.col + i < DIMENSION):
 
-            if chess_board[self.row + i][self.col + i] is EMPTY:
+            keep_looping = self.loop_empty_or_enemy(self.row + i, self.col + i)
 
-                self.available_moves.append((self.row + i, self.col + i))
-
-            else:
-                if chess_board[self.row + i][self.col + i].colour != self.colour:
-
-                    self.available_moves.append((self.row + i, self.col + i))
-
-                break    
+            if keep_looping == False:
+                break
 
             i += 1
 
@@ -318,24 +320,19 @@ class Knight(Piece):
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
 
-    # def get_available_moves(self):
+    def get_available_moves(self):
 
-    #     possible_row = 0
-    #     possible_col = 0
+        for n_possible_row in range(0, DIMENSION):
+            for n_possible_col in range(0, DIMENSION):
 
+                # L shape movement
+                if abs(n_possible_row - self.row) == 2 and abs(n_possible_col - self.col) == 1:
 
-    #     # L shape movement
-    #     if abs(possible_row - self.row) == 2 and abs(possible_col - self.col) == 1:
+                    self.empty_or_enemy(n_possible_row, n_possible_col)
 
-    #         # if chess_board[self.row + calc][self.col + calc] != EMPTY:
+                if abs(n_possible_row - self.row) == 1 and abs(n_possible_col - self.col) == 2:
 
-    #         #     if chess_board[self.row + calc][self.col + calc].colour != self.colour:
-
-    #         #         self.available_moves.append((self.row + calc, self.col + calc))
-
-    #     if abs(possible_row - self.row) == 1 and abs(possible_col - self.col) == 2:
-    #         pass
-    #     return False
+                    self.empty_or_enemy(n_possible_row, n_possible_col)
 
 class King(Piece):
 
@@ -343,36 +340,40 @@ class King(Piece):
         super().__init__(colour, row, col)
         self.can_castle = True
 
-    def move_cap(self, target_row, target_col):
+    def get_available_moves(self):
 
-        # Left, right, up, down
-        if abs(target_row - self.row) + abs(target_col - self.col) == 1:
-            
-            if self.piece_move_capture(target_row, target_col) == True:
-                self.can_castle = False
-                return True
+        for k_possible_row in range(0, DIMENSION):
+            for k_possible_col in range(0, DIMENSION):
 
-        # Diagonally - up left, up right, down left, down right
-        elif abs(target_row - self.row) ==  abs(target_col - self.col) == 1:
-            
-            if self.piece_move_capture(target_row, target_col) == True:
-                self.can_castle = False              
-                return True
+                # Left, right, up, down
+                if abs(k_possible_row - self.row) + abs(k_possible_col - self.col) == 1:
+
+                    self.empty_or_enemy(k_possible_row, k_possible_col)
+
+                # Diagonally - up left, up right, down left, down right
+
+                if abs(k_possible_row - self.row) == abs(k_possible_col - self.col) == 1:
+
+                    self.empty_or_enemy(k_possible_row, k_possible_col)
+                
+    
+    # TODO: MIKE integrate castling code into available moves mechanism
+    # def move_cap(self, target_row, target_col):
         
-        elif self.can_castle == True:
-            print("can castle")
-            if target_row == self.row and target_col == 6: #right side castle
-                if chess_board[self.row][self.col + 1] == EMPTY and chess_board[self.row][self.col+2] == EMPTY and isinstance(chess_board[self.row][self.col+3], Rook) == True:
-                    self.castle(target_row, target_col, chess_board[self.row][self.col+3], 5)
-                    self.can_castle = False
-                    return True
-            elif target_row == self.row and target_col == 2: # left side castle
-                if chess_board[self.row][self.col - 1] == EMPTY and chess_board[self.row][self.col-2] == EMPTY and chess_board[self.row][self.col-3] == EMPTY and \
-                    isinstance(chess_board[self.row][self.col-4], Rook) == True:
-                    self.castle(target_row, target_col, chess_board[self.row][self.col-4], 3)
-                    self.can_castle = False
-                    return True
-        return False
+    #     elif self.can_castle == True:
+    #         print("can castle")
+    #         if target_row == self.row and target_col == 6: #right side castle
+    #             if chess_board[self.row][self.col + 1] == EMPTY and chess_board[self.row][self.col+2] == EMPTY and isinstance(chess_board[self.row][self.col+3], Rook) == True:
+    #                 self.castle(target_row, target_col, chess_board[self.row][self.col+3], 5)
+    #                 self.can_castle = False
+    #                 return True
+    #         elif target_row == self.row and target_col == 2: # left side castle
+    #             if chess_board[self.row][self.col - 1] == EMPTY and chess_board[self.row][self.col-2] == EMPTY and chess_board[self.row][self.col-3] == EMPTY and \
+    #                 isinstance(chess_board[self.row][self.col-4], Rook) == True:
+    #                 self.castle(target_row, target_col, chess_board[self.row][self.col-4], 3)
+    #                 self.can_castle = False
+    #                 return True
+    #     return False
 
     def castle(self, target_row, target_col, rook, rook_col):
         print("castled")
