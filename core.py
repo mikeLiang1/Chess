@@ -67,11 +67,7 @@ class Piece():
         # if not isinstance(chess_board[target_row][target_col], str):
                   
         if chess_board[target_row][target_col] == EMPTY or chess_board[target_row][target_col].colour != self.colour: 
-            copy_array = [[],[],[],[],[],[],[],[]]
-            for i in range(DIMENSION):
-                copy_array[i] = copy.deepcopy(chess_board[i])
-
-            last_board_state.append(copy_array)
+            add_to_undo()
             
             self.piece_move(target_row, target_col)
             
@@ -149,6 +145,8 @@ class Pawn(Piece):
         
         # Pawn advance : Target square is one space forward, ensure it contains EMPTY
         if chess_board[target_row][target_col] == EMPTY and target_row == self.row + calc and target_col == self.col:
+            if target_row == 0 or target_row == 7: # promoting pawn
+                return self.promote(target_row, target_col)
             return self.piece_move_capture(target_row, target_col)
             
         
@@ -163,10 +161,28 @@ class Pawn(Piece):
         # Pawn diagonal capture : If target square is the one square diagonally forward (left and right)
         elif target_row == self.row + calc and (target_col == self.col + calc or target_col == self.col - calc):
             if chess_board[target_row][target_col] != EMPTY: 
+                if target_row == 0 or target_row == 7: # promoting pawn
+                    return self.promote(target_row, target_col)
 
                 return self.piece_move_capture(target_row, target_col)
                
         return False
+
+    def promote(self, target_row, target_col):
+        if chess_board[target_row][target_col] == EMPTY or chess_board[target_row][target_col].colour != self.colour:
+            copy_array = [[],[],[],[],[],[],[],[]]
+            for i in range(DIMENSION):
+                copy_array[i] = copy.deepcopy(chess_board[i])
+
+            last_board_state.append(copy_array)
+            chess_board[self.row][self.col] = EMPTY
+            chess_board[target_row][target_col] = Queen(self.colour, target_row, target_col)
+            print(chess_board[target_row][target_col])
+            
+            return True
+        
+        return False
+
 
 class Queen(Piece):
     
@@ -206,7 +222,10 @@ class Rook(Queen):
         super().__init__(colour, row, col)
 
     def move_cap(self, row, col):
-        return self.rook_move_cap(row, col)
+        if self.rook_move_cap(row, col) == True:
+            wK.can_castle = False
+            return True
+        return True
 
 class Bishop(Queen):
     def __init__(self, colour, row, col):
@@ -235,19 +254,53 @@ class King(Piece):
 
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
+        self.can_castle = True
 
     def move_cap(self, target_row, target_col):
 
         # Left, right, up, down
         if abs(target_row - self.row) + abs(target_col - self.col) == 1:
             
-            return self.piece_move_capture(target_row, target_col)
+            if self.piece_move_capture(target_row, target_col) == True:
+                self.can_castle = False
+                return True
 
         # Diagonally - up left, up right, down left, down right
         elif abs(target_row - self.row) ==  abs(target_col - self.col) == 1:
             
-            return self.piece_move_capture(target_row, target_col)
+            if self.piece_move_capture(target_row, target_col) == True:
+                self.can_castle = False              
+                return True
+        
+        elif self.can_castle == True:
+            print("can castle")
+            if target_row == self.row and target_col == 6: #right side castle
+                if chess_board[self.row][self.col + 1] == EMPTY and chess_board[self.row][self.col+2] == EMPTY and isinstance(chess_board[self.row][self.col+3], Rook) == True:
+                    self.castle(target_row, target_col, chess_board[self.row][self.col+3], 5)
+                    self.can_castle = False
+                    return True
+            elif target_row == self.row and target_col == 2: # left side castle
+                if chess_board[self.row][self.col - 1] == EMPTY and chess_board[self.row][self.col-2] == EMPTY and chess_board[self.row][self.col-3] == EMPTY and \
+                    isinstance(chess_board[self.row][self.col-4], Rook) == True:
+                    self.castle(target_row, target_col, chess_board[self.row][self.col-4], 3)
+                    self.can_castle = False
+                    return True
         return False
+        
+    def castle(self, target_row, target_col, rook, rook_col):
+        print("castled")
+        add_to_undo()
+        self.piece_move(target_row, target_col)
+        rook.piece_move(target_row, rook_col)
+
+        
+def add_to_undo():
+    copy_array = [[],[],[],[],[],[],[],[]]
+    for i in range(DIMENSION):
+        copy_array[i] = copy.deepcopy(chess_board[i])
+
+    last_board_state.append(copy_array)
+
 
 cur_turn = 'white'
 
