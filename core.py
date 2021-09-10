@@ -61,25 +61,12 @@ class Piece():
 
     # Function that can capture and/or move
     def piece_move_capture(self, target_row, target_col):
-
-        # Ensure only capture a piece within our 8 x 8 array 
-        # assert (0 <= target_row and target_row <= DIMENSION - 1) 
-        # assert (0 <= target_col and target_row <= DIMENSION - 1)
-
-        # Piece capture : Target piece can only be captured if object exists at location (not a string)
-        # if not isinstance(chess_board[target_row][target_col], str):
-        
                   
         if chess_board[target_row][target_col] == EMPTY or chess_board[target_row][target_col].colour != self.colour: 
-            add_to_undo()
-
-            self.moved = True
-            
+            add_to_undo()         
             self.piece_move(target_row, target_col)
             
-            return True
-        
-        
+            return True           
         return False
 
     # Loop through available moves list, if target square matches a tuple in available moves list, return move capture function

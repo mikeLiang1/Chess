@@ -54,14 +54,19 @@ def main():
                         if board[selected_square[0]][selected_square[1]].move_cap(row, col) == True:  
                             core.flip_sides()                         
                             #animate_move(screen, board, clock, (row,col), selected_square, board[row][col])
+                            #highlight_move(screen, selected_square, (row,col))
 
                     else:
                         board[selected_square[0]][selected_square[1]].available_moves.clear()     
+
                     selected_square = ()
                                                               
         draw_game_state(screen, board, selected_square, moves)
         clock.tick(MAX_FPS)
         p.display.flip()
+    
+#def highlight_move(screen, target, current):
+
 
 # highlight sqaure selected and posibble moves
 def highlight_squares(screen, selected_sq, moves, board):
