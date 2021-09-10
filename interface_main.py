@@ -53,7 +53,7 @@ def main():
 
                         if board[selected_square[0]][selected_square[1]].move_cap(row, col) == True:  
                             core.flip_sides()                         
-                            animate_move(screen, board, clock, (row,col), selected_square, board[row][col])
+                            #animate_move(screen, board, clock, (row,col), selected_square, board[row][col])
 
                     else:
                         board[selected_square[0]][selected_square[1]].available_moves.clear()     
@@ -64,7 +64,7 @@ def main():
         p.display.flip()
 
 # highlight sqaure selected and posibble moves
-def highlight_squares(screen, selected_sq, moves):
+def highlight_squares(screen, selected_sq, moves, board):
     if (selected_sq == ()):
         return
     r,c = selected_sq
@@ -77,16 +77,18 @@ def highlight_squares(screen, selected_sq, moves):
     for move in moves:
         r, c = move
         s.fill(p.Color(0, 255, 255))
+        if board[r][c] != core.EMPTY:
+            s.fill(p.Color(238, 29, 35))
         screen.blit(s, (c*SQ_SIZE, r*SQ_SIZE))
     
 
 def draw_game_state(screen, board, selected_square, moves):
     draw_board(screen)
-    highlight_squares(screen, selected_square, moves)
+    highlight_squares(screen, selected_square, moves, board)
     draw_pieces(screen, board)
 
 def draw_board(screen):
-    colors = [p.Color("white"), p.Color("pink")]
+    colors = [p.Color("white"), p.Color(254, 211, 169)]
     for r in range(DIMENSION):
         for c in range(DIMENSION):
             color = colors[((r+c) %2)]
@@ -104,14 +106,16 @@ def animate_move(screen, board, clock, target, start, piece):
     
     dr = target[0] - start[0]
     dc = target[1] - start[1]
-    frames = 10
+    frames = 20
+    
     frame_count = (abs(dr) + abs(dc) * frames)
+        
     for frame in range(frame_count + 1):
         r, c = (start[0] + dr*frame/frame_count, start[1] + dc*frame/frame_count)
         draw_board(screen)
         draw_pieces(screen, board)
         screen.blit(IMAGES[repr(piece)], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE)) 
-        p.display.flip()
+        p.display.flip()          
         clock.tick(60)
 
 if __name__ == '__main__':
