@@ -12,7 +12,7 @@
 # 2.0) Available moves function
 
 # ONGOING
-# 1.3) Special moves - Castling (both sides), pawn promotion, en pessant?
+# 1.3) Special moves - Castling (both sides), pawn promotion, en pessant, pawn moves double ranks??
 # 1.31) CHECKMATE, STALEMATE, in check (should you be able to click on other pieces that can't stop the check?)
 
 # FUTURE
@@ -25,8 +25,9 @@ EMPTY = "--"
 
 
 cur_turn = 'white'
-all_available_moves = []
+
 ## Functions
+
 
 ## Classes
 class Piece():
@@ -37,7 +38,6 @@ class Piece():
         self.col = col
         self.moved = False
         self.available_moves = []
-        self.is_being_checked = False
 
     def __repr__(self): # TODO: Should be __str__
         class_name = type(self).__name__ 
@@ -61,19 +61,25 @@ class Piece():
 
     # Function that can capture and/or move
     def piece_move_capture(self, target_row, target_col):
+
+        # Ensure only capture a piece within our 8 x 8 array 
+        # assert (0 <= target_row and target_row <= DIMENSION - 1) 
+        # assert (0 <= target_col and target_row <= DIMENSION - 1)
+
+        # Piece capture : Target piece can only be captured if object exists at location (not a string)
+        # if not isinstance(chess_board[target_row][target_col], str):
+        
                   
         if chess_board[target_row][target_col] == EMPTY or chess_board[target_row][target_col].colour != self.colour: 
-            add_to_undo()         
-            self.piece_move(target_row, target_col)
+            add_to_undo()
 
-            self.get_all_available_moves()
-            print(all_available_moves)
-            # self.piece_is_checking()
-            print(self.piece_is_checking())
-            self.available_moves.clear()
-            all_available_moves.clear()
+            self.moved = True
             
-            return True           
+            self.piece_move(target_row, target_col)
+            
+            return True
+        
+        
         return False
 
     # Loop through available moves list, if target square matches a tuple in available moves list, return move capture function
@@ -81,7 +87,7 @@ class Piece():
     def move_cap(self, target_row, target_col):
         
         curr_available_moves = copy.deepcopy(self.available_moves)
-
+        self.available_moves.clear()
         
         for i in curr_available_moves:
 
@@ -140,96 +146,10 @@ class Piece():
 
             return False
 
-    # Loops through all piece's moves and if any matches YOUR king's square, piece is checking enemy king
-    def piece_is_checking(self):
-
-        if self.colour == 'black':
+    # Loops through EVERY enemy piece's available moves and if any matches your king's square, you are in check
+    def is_in_check():
+        pass
         
-            king_row = bK.row
-            king_col = bK.col
-            
-
-            # TODO: All available moves change
-            curr_available_moves = copy.deepcopy(all_available_moves)
-
-            for i in curr_available_moves:
-
-                if (king_row, king_col) == i:
-
-                    bK.is_being_checked = True
-                    # print("nope")
-                    return True
-
-                else:
-                    # print("yep")
-                    bK.is_being_checked = False
-            
-            return False
-
-        elif self.colour == 'white':
-
-            king_row = wK.row 
-            king_col = wK.col
-
-            curr_available_moves = copy.deepcopy(all_available_moves)
-
-            for i in curr_available_moves:
-
-                if (king_row, king_col) == i:
-
-                    wK.is_being_checked = True
-                    # print("no")
-                    return True
-
-                else:
-                    # print("yep")
-                    wK.is_being_checked = False
-
-            return False
-
-    def get_all_available_moves(self):
-        # TODO: Shorten code here (use .format??)
-
-        if self.colour == 'white':
-            all_available_moves.append(bR1.get_available_moves())
-            all_available_moves.append(bN1.get_available_moves())
-            all_available_moves.append(bB1.get_available_moves())
-            all_available_moves.append(bQ.get_available_moves())
-            all_available_moves.append(bK.get_available_moves())
-            all_available_moves.append(bB2.get_available_moves())
-            all_available_moves.append(bN2.get_available_moves())
-            all_available_moves.append(bR2.get_available_moves())
-
-            all_available_moves.append(bP1.get_available_moves())
-            all_available_moves.append(bP2.get_available_moves())
-            all_available_moves.append(bP3.get_available_moves())
-            all_available_moves.append(bP4.get_available_moves())
-            all_available_moves.append(bP5.get_available_moves())
-            all_available_moves.append(bP6.get_available_moves())
-            all_available_moves.append(bP7.get_available_moves())
-            all_available_moves.append(bP8.get_available_moves())
-
-        elif self.colour == 'black':    
-
-            all_available_moves.append(wR1.get_available_moves())
-            all_available_moves.append(wN1.get_available_moves())
-            all_available_moves.append(wB1.get_available_moves())
-            all_available_moves.append(wQ.get_available_moves())
-            all_available_moves.append(wK.get_available_moves())
-            all_available_moves.append(wB2.get_available_moves())
-            all_available_moves.append(wN2.get_available_moves())
-            all_available_moves.append(wR2.get_available_moves())
-
-            all_available_moves.append(wP1.get_available_moves())
-            all_available_moves.append(wP2.get_available_moves())
-            all_available_moves.append(wP3.get_available_moves())
-            all_available_moves.append(wP4.get_available_moves())
-            all_available_moves.append(wP5.get_available_moves())
-            all_available_moves.append(wP6.get_available_moves())
-            all_available_moves.append(wP7.get_available_moves())
-            all_available_moves.append(wP8.get_available_moves())
-            
-
 ## Subclasses
 class Pawn(Piece): 
 
@@ -243,6 +163,20 @@ class Pawn(Piece):
         if self.colour == 'black':
             calc = 1
 
+         # Pawn advance : Target square is one space forward, ensure it contains EMPTY
+        if 0 <= self.row + calc and self.row + calc <= DIMENSION - 1:
+
+            if chess_board[self.row + calc][self.col] == EMPTY:
+
+                self.available_moves.append((self.row + calc, self.col))
+        
+        # Pawn double advance : Target square is two spaces forward, if on starting rank
+        if 0 <= self.row + 2*calc and self.row + 2*calc <= DIMENSION - 1:  
+
+            if chess_board[self.row + 2*calc][self.col] == EMPTY and chess_board[self.row + calc][self.col] == EMPTY and self.row == 3.5 - 2.5 * calc:
+
+                self.available_moves.append((self.row + 2*calc, self.col))
+        
         # Pawn diagonal capture : If target square is the one square diagonally forward (left)
         if 0 <= self.row + calc and self.row + calc <= DIMENSION - 1 and 0 <= self.col + calc and self.col + calc <= DIMENSION - 1:
 
@@ -261,25 +195,6 @@ class Pawn(Piece):
                 
                     self.available_moves.append((self.row + calc, self.col - calc))
 
-        # Add all the pawn capture available moves to a specified list that can potentially check a king 
-        pawn_check_available_move = copy.deepcopy(self.available_moves)
-
-         # Pawn advance : Target square is one space forward, ensure it contains EMPTY
-        if 0 <= self.row + calc and self.row + calc <= DIMENSION - 1:
-
-            if chess_board[self.row + calc][self.col] == EMPTY:
-
-                self.available_moves.append((self.row + calc, self.col))
-        
-        # Pawn double advance : Target square is two spaces forward, if on starting rank
-        if 0 <= self.row + 2*calc and self.row + 2*calc <= DIMENSION - 1:  
-
-            if chess_board[self.row + 2*calc][self.col] == EMPTY and chess_board[self.row + calc][self.col] == EMPTY and self.row == 3.5 - 2.5 * calc:
-
-                self.available_moves.append((self.row + 2*calc, self.col))
-        
-        return pawn_check_available_move
-        
     def promote(self, target_row, target_col):
         if chess_board[target_row][target_col] == EMPTY or chess_board[target_row][target_col].colour != self.colour:
             add_to_undo()
@@ -390,11 +305,11 @@ class Queen(Piece):
 
             i += 1
 
+
     def get_available_moves(self):
 
         # Target square is a horizontal, vertical or diagonal
-        self.get_rook_available_moves() or self.get_bishop_available_moves()
-        return self.available_moves
+        return self.get_rook_available_moves() or self.get_bishop_available_moves()
 
 class Rook(Queen):
 
@@ -402,18 +317,14 @@ class Rook(Queen):
         super().__init__(colour, row, col)
 
     def get_available_moves(self):
-        self.get_rook_available_moves()
-
-        return self.available_moves
+        return self.get_rook_available_moves()
 
 class Bishop(Queen):
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
              
     def get_available_moves(self):
-        self.get_bishop_available_moves()
-
-        return self.available_moves
+        return self.get_bishop_available_moves()
 
 class Knight(Piece):
     
@@ -433,9 +344,6 @@ class Knight(Piece):
                 if abs(n_possible_row - self.row) == 1 and abs(n_possible_col - self.col) == 2:
 
                     self.empty_or_enemy(n_possible_row, n_possible_col)
-
-        return self.available_moves
-
 
 class King(Piece):
 
@@ -457,8 +365,6 @@ class King(Piece):
                 if abs(k_possible_row - self.row) == abs(k_possible_col - self.col) == 1:
 
                     self.empty_or_enemy(k_possible_row, k_possible_col)
-
-        return self.available_moves
                 
                 
                 if self.moved == False:
@@ -565,5 +471,3 @@ chess_board = [
 ]
 
 last_board_state = []
-
-
