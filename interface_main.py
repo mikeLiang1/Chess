@@ -1,6 +1,7 @@
 import pygame as p
 import os
 import core
+import copy
 
 
 os.environ["SDL_VIDEODRIVER"]="x11"
@@ -24,43 +25,58 @@ def main():
     screen = p.display.set_mode((WIDTH,HEIGHT))
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
-    board = core.chess_board
+  
     moves = []
     load_images()
     running = True
     selected_square = () # a tuple of selected square (row, column)
 
     while running:
+        board = core.chess_board
         for event in p.event.get():
             if event.type == p.QUIT:
                 running = False
             elif event.type == p.KEYDOWN:
                 if event.key == p.K_z:
                     core.undoMove()
-
             elif event.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos()
                 col = location[0]//SQ_SIZE
                 row = location[1]//SQ_SIZE
+                #print(core.cur_turn)
+                core.get_all_available_moves(core.cur_turn)
                 if selected_square == (): #first click
                     if board[row][col] != "--" and board[row][col].colour == core.cur_turn: # only if i clicked on a piece i can move it        
-                        selected_square = (row, col)    
-                        board[row][col].get_available_moves()  
-                        moves = board[row][col].available_moves    
-                        print(moves)                   
+                        selected_square = (row, col)   
+                        
+                        if core.is_in_check(core.cur_turn):
+                            print("hi")
+                            # board[row][col].get_available_moves()
+                            # new_moves = copy.deepcopy(board[row][col].available_moves)
+                            # print(new_moves) 
+                            
+                            # board[row][col].move_cap(new_moves[0][0], new_moves[0][1])
+                            # if (core.is_in_check(core.cur_turn)):
+                            #     print("still in check")
+                            # core.undoMove()
+                            # #core.flip_sides
+                                
+                             
+                        moves = board[row][col].available_moves  
+                        
+                        #print(core.bQ.available_moves)                  
                 else: #second click
-                    if selected_square != (row,col):  
+                    if selected_square != (row,col):  # if didnt click same spot
 
-                        if board[selected_square[0]][selected_square[1]].move_cap(row, col) == True:  
+                        if board[selected_square[0]][selected_square[1]].move_cap(row, col) == True:  # if clicked on available move sqaure
                             core.flip_sides()                         
                             #animate_move(screen, board, clock, (row,col), selected_square, board[row][col])
                             #highlight_move(screen, selected_square, (row,col))
-
-                    else:
-                        board[selected_square[0]][selected_square[1]].available_moves.clear()     
-
+                    core.clear_available_moves()
+                            
+                    
                     selected_square = ()
-                                                              
+                     
         draw_game_state(screen, board, selected_square, moves)
         clock.tick(MAX_FPS)
         p.display.flip()
