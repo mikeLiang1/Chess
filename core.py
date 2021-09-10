@@ -436,7 +436,7 @@ def add_to_undo():
             copy_array[i][j] = copy.deepcopy(chess_board[i][j])
     
     last_board_state.append(copy_array)
-    print(chess_board)
+    #print(chess_board)
 
 cur_turn = 'white'
 
@@ -455,10 +455,8 @@ def undoMove():
         for j in range(0, DIMENSION):
             chess_board[i][j] = copy.deepcopy(copy_array[i][j])
     
-    get_all_available_moves(cur_turn)
     flip_sides()
-    get_all_available_moves(cur_turn)
-    
+  
     
     
        

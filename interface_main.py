@@ -57,13 +57,13 @@ def main():
                             
                             # board[row][col].move_cap(new_moves[0][0], new_moves[0][1])
                             # if (core.is_in_check(core.cur_turn)):
-                            #     print("still in check")
+                            #     print("szztill in check")
                             # core.undoMove()
                             # #core.flip_sides
                                 
                              
                         moves = board[row][col].available_moves  
-                        
+                        print(moves)
                         #print(core.bQ.available_moves)                  
                 else: #second click
                     if selected_square != (row,col):  # if didnt click same spot
