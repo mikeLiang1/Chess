@@ -85,8 +85,7 @@ class Piece():
     # TODO: Changge move_cap function name
     def move_cap(self, target_row, target_col):
         
-        curr_available_moves = copy.deepcopy(self.available_moves)
-        self.available_moves.clear()
+        curr_available_moves = copy.deepcopy(self.get_available_moves())
         
         for i in curr_available_moves:
 
@@ -192,6 +191,10 @@ class Pawn(Piece):
                 
                     self.available_moves.append((self.row + calc, self.col - calc))
 
+        copy_arr = copy.deepcopy(self.available_moves)
+        self.available_moves.clear()
+        return copy_arr
+
     def promote(self, target_row, target_col):
         if chess_board[target_row][target_col] == EMPTY or chess_board[target_row][target_col].colour != self.colour:
             add_to_undo()
@@ -255,6 +258,9 @@ class Queen(Piece):
 
             if keep_looping == False:
                 break
+        copy_arr = copy.deepcopy(self.available_moves)
+        self.available_moves.clear()
+        return copy_arr
 
     def get_bishop_available_moves(self):
         
@@ -302,11 +308,19 @@ class Queen(Piece):
 
             i += 1
 
+        copy_arr = copy.deepcopy(self.available_moves)
+        self.available_moves.clear()
+        return copy_arr
 
     def get_available_moves(self):
 
         # Target square is a horizontal, vertical or diagonal
-        return self.get_rook_available_moves() or self.get_bishop_available_moves()
+        moves = []
+        for move in self.get_rook_available_moves():
+            moves.append(move)
+        for move in self.get_bishop_available_moves():
+            moves.append(move)
+        return moves
 
 class Rook(Queen):
 
@@ -342,6 +356,9 @@ class Knight(Piece):
 
                     self.empty_or_enemy(n_possible_row, n_possible_col)
 
+        copy_arr = copy.deepcopy(self.available_moves)
+        self.available_moves.clear()
+        return copy_arr
 class King(Piece):
 
     def __init__(self, colour, row, col):
@@ -374,7 +391,10 @@ class King(Piece):
                         if chess_board[self.row][self.col - 1] == EMPTY and chess_board[self.row][self.col-2] == EMPTY and chess_board[self.row][self.col-3] == EMPTY and \
                         isinstance(rook, Rook) == True and rook.moved == False:   
                             self.available_moves.append((self.row, 2))   
-                        
+
+        copy_arr = copy.deepcopy(self.available_moves)
+        self.available_moves.clear()
+        return copy_arr                
         
     def castle(self, target_row, target_col, rook, rook_col):
         print("castled")
@@ -386,29 +406,25 @@ def get_all_available_moves(colour):
     all_moves = []
     if colour == 'white':
         for piece in white_pieces:
-            piece.get_available_moves()
-            for move in piece.available_moves:
+            for move in piece.get_available_moves():
                 all_moves.append(move)
     else:
-        for piece in black_pieces:
-            piece.get_available_moves()
-            for move in piece.available_moves:
+        for piece in black_pieces:      
+            for move in piece.get_available_moves():
                 all_moves.append(move)
     return all_moves
 
-
+# after capture, queen still thniks piece is there?
 def is_in_check(colour):
+    
     if colour == 'white':
         all_moves = get_all_available_moves('black')
-        #print(all_moves)
-
-        for move in all_moves:
-            
+        print(all_moves)
+        for move in all_moves:          
             if move == (wK.row, wK.col): # a piece is checking my king
                 print("white king in check")
                
                 return True
-
     else:
         all_moves = get_all_available_moves('white')
         #print(all_moves)
@@ -451,9 +467,9 @@ def undoMove():
     global last_board_state
     if (last_board_state == []): # if empty
         return
-    print(chess_board)
-    print("\n")
-    print(last_board_state)
+    # print(chess_board)
+    # print("\n")
+    # print(last_board_state)
     for i in range(DIMENSION):
         chess_board[i] = copy.deepcopy(last_board_state[-1][i])   
     last_board_state.pop()

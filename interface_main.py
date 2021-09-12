@@ -47,12 +47,19 @@ def main():
                 if selected_square == (): #first click
                     if board[row][col] != "--" and board[row][col].colour == core.cur_turn: # only if i clicked on a piece i can move it        
                         selected_square = (row, col)   
-                        board[row][col].get_available_moves()  
+                        moves = board[row][col].get_available_moves()  
                         if core.is_in_check(core.cur_turn):
                             print("hi")
-                            # board[row][col].get_available_moves()
-                            # new_moves = copy.deepcopy(board[row][col].available_moves)
+                            
+                            
                             # print(new_moves) 
+                            for move in moves:
+                                print(move)
+                                if board[row][col].move_cap(move[0], move[1]) == True:
+
+                                    core.undoMove()
+                                    core.flip_sides()
+                            print(core.cur_turn)
                             
                             # board[row][col].move_cap(new_moves[0][0], new_moves[0][1])
                             # if (core.is_in_check(core.cur_turn)):
@@ -61,19 +68,15 @@ def main():
                             # #core.flip_sides
                                 
                              
-                        moves = board[row][col].available_moves  
                         print(moves)
                         #print(core.bQ.available_moves)                  
                 else: #second click
                     if selected_square != (row,col):  # if didnt click same spot
-
+                        #print("not clicked on smae sqaure")
                         if board[selected_square[0]][selected_square[1]].move_cap(row, col) == True:  # if clicked on available move sqaure
                             core.flip_sides()                         
                             #animate_move(screen, board, clock, (row,col), selected_square, board[row][col])
                             #highlight_move(screen, selected_square, (row,col))
-                    else:
-                        board[selected_square[0]][selected_square[1]].available_moves.clear() 
-                            
                     
                     selected_square = ()
                      
