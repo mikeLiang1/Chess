@@ -85,7 +85,7 @@ class Piece():
     # TODO: Changge move_cap function name
     def move_cap(self, target_row, target_col):
         
-        curr_available_moves = copy.deepcopy(self.get_available_moves())
+        curr_available_moves = self.get_available_moves()
         
         for i in curr_available_moves:
 
@@ -405,13 +405,17 @@ class King(Piece):
 def get_all_available_moves(colour):
     all_moves = []
     if colour == 'white':
-        for piece in white_pieces:
-            for move in piece.get_available_moves():
-                all_moves.append(move)
+        for i in range(0,DIMENSION):
+            for j in range(0, DIMENSION):
+                if (chess_board[i][j] != EMPTY and chess_board[i][j].colour == 'white'):
+                    for move in chess_board[i][j].get_available_moves():
+                        all_moves.append(move)
     else:
-        for piece in black_pieces:      
-            for move in piece.get_available_moves():
-                all_moves.append(move)
+        for i in range(0,DIMENSION):
+            for j in range(0, DIMENSION):
+                if (chess_board[i][j] != EMPTY and chess_board[i][j].colour == 'black'):
+                    for move in chess_board[i][j].get_available_moves():
+                        all_moves.append(move)
     return all_moves
 
 # after capture, queen still thniks piece is there?
@@ -419,7 +423,7 @@ def is_in_check(colour):
     
     if colour == 'white':
         all_moves = get_all_available_moves('black')
-        print(all_moves)
+        
         for move in all_moves:          
             if move == (wK.row, wK.col): # a piece is checking my king
                 print("white king in check")
@@ -446,11 +450,10 @@ def clear_available_moves():
     
         
 def add_to_undo():  
-    copy_array = [[],[],[],[],[],[],[],[]]
-    for i in range(DIMENSION):
-        copy_array[i] = copy.deepcopy(chess_board[i])
-
-    last_board_state.append(copy_array)
+    global last_board_state
+    for i in range(0,DIMENSION):
+        for j in range(0,DIMENSION):
+            last_board_state[i][j] = copy.copy(chess_board[i][j])
 
 cur_turn = 'white'
 
@@ -464,15 +467,10 @@ def flip_sides():
 def undoMove():
     
     global chess_board 
-    global last_board_state
-    if (last_board_state == []): # if empty
-        return
-    # print(chess_board)
-    # print("\n")
-    # print(last_board_state)
-    for i in range(DIMENSION):
-        chess_board[i] = copy.deepcopy(last_board_state[-1][i])   
-    last_board_state.pop()
+    for i in range(0,DIMENSION):
+        for j in range(0,DIMENSION):
+            chess_board[i][j] = copy.copy(last_board_state[i][j])
+
     flip_sides()
   
     
@@ -534,4 +532,14 @@ chess_board = [
     [wR1, wN1, wB1, wQ, wK, wB2, wN2, wR2]
 ]
 
-last_board_state = []
+last_board_state = [ 
+
+    [bR1, bN1, bB1, bQ, bK, bB2, bN2, bR2],
+    [bP1, bP2, bP3, bP4, bP5, bP6, bP7, bP8],
+    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+    [wP1, wP2, wP3, wP4, wP5, wP6, wP7, wP8],
+    [wR1, wN1, wB1, wQ, wK, wB2, wN2, wR2]
+]

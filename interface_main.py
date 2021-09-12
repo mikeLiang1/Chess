@@ -30,6 +30,7 @@ def main():
     load_images()
     running = True
     selected_square = () # a tuple of selected square (row, column)
+    new_arr = []
 
     while running:
         board = core.chess_board
@@ -47,29 +48,21 @@ def main():
                 if selected_square == (): #first click
                     if board[row][col] != "--" and board[row][col].colour == core.cur_turn: # only if i clicked on a piece i can move it        
                         selected_square = (row, col)   
-                        moves = board[row][col].get_available_moves()  
-                        if core.is_in_check(core.cur_turn):
-                            print("hi")
+                        moves = board[row][col].get_available_moves()                
+                        
+                        for move in moves: 
+                            if board[row][col].move_cap(move[0], move[1]) == True:
+                                if not core.is_in_check(core.cur_turn):
+                                    print("move good ")
+                                    new_arr.append(move)
+                                    print(move)
+                                core.undoMove()
+                                core.flip_sides()
+                        moves = copy.deepcopy(new_arr)
+                        new_arr.clear()
                             
-                            
-                            # print(new_moves) 
-                            for move in moves:
-                                print(move)
-                                if board[row][col].move_cap(move[0], move[1]) == True:
-
-                                    core.undoMove()
-                                    core.flip_sides()
-                            print(core.cur_turn)
-                            
-                            # board[row][col].move_cap(new_moves[0][0], new_moves[0][1])
-                            # if (core.is_in_check(core.cur_turn)):
-                            #     print("szztill in check")
-                            # core.undoMove()
-                            # #core.flip_sides
                                 
-                             
-                        print(moves)
-                        #print(core.bQ.available_moves)                  
+                                        
                 else: #second click
                     if selected_square != (row,col):  # if didnt click same spot
                         #print("not clicked on smae sqaure")
@@ -83,8 +76,6 @@ def main():
         draw_game_state(screen, board, selected_square, moves)
         clock.tick(MAX_FPS)
         p.display.flip()
-    
-#def highlight_move(screen, target, current):
 
 
 # highlight sqaure selected and posibble moves
