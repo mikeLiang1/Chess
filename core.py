@@ -46,8 +46,6 @@ class Piece():
             
         return "{}{}".format(self.colour[0], class_name[0]) # Returns 2 letter string showing colour and piece type respectively
 
-    # def __repr__(self):
-    #     return "{}('{}', '{}', '{}')".format(type(self).__name__, self.colour, self.col, self.row)
 
     # Moves piece at original square to the target square
 
@@ -81,8 +79,6 @@ class Piece():
         
         return False
 
-    # Loop through available moves list, if target square matches a tuple in available moves list, return move capture function
-    # TODO: Changge move_cap function name
     def move_cap(self, target_row, target_col, possible_moves):
         
         
@@ -100,13 +96,6 @@ class Piece():
                     if target_row == self.row and target_col == 6:
                         self.castle(target_row, target_col, chess_board[self.row][self.col+3], 5)
                         return True
-                    #if self.piece_move_capture
-                    
-                
-                # 1) Run is_in_check function (checks if your OWN king is in check)
-                # 2) For the piece in question (clicked) , loop through available moves and save the ones which 'stop' the check (using is_in_check), either by capturing or blockinig
-                # 2.1 Dont open your own king up to check (run is_in_check again, take out invalid moves)
-                # 3) Update the saved squares as the new available moves
 
                 return self.piece_move_capture(target_row, target_col)
 
@@ -418,10 +407,9 @@ def get_all_available_moves(colour):
 
 # after capture, queen still thniks piece is there?
 def is_in_check(colour):
-    
+    king = findKing(colour)
     if colour == 'white':
         all_moves = get_all_available_moves('black')
-        king = findKing(colour)
         for move in all_moves:          
             if move == (king.row, king.col): # a piece is checking my king
                 print("white king in check")
@@ -429,9 +417,8 @@ def is_in_check(colour):
                 return True
     else:
         all_moves = get_all_available_moves('white')
-        #print(all_moves)
         for move in all_moves:
-            if move == (bK.row, bK.col): # a piece is checking my king
+            if move == (king.row, king.col): # a piece is checking my king
                 print("black king in check")
                
                 return True

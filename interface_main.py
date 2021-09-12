@@ -25,12 +25,15 @@ def main():
     screen = p.display.set_mode((WIDTH,HEIGHT))
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
-  
+    played_move = ()
+    played_from = ()
     moves = []
     load_images()
     running = True
     selected_square = () # a tuple of selected square (row, column)
     new_arr = []
+    king_square = ()
+    
 
     while running:
         board = core.chess_board
@@ -50,6 +53,7 @@ def main():
                         selected_square = (row, col)   
                         moves = board[row][col].get_available_moves()                
                         print("moves are", moves)
+                          
                         for move in moves: 
                             if board[row][col].move_cap(move[0], move[1], moves) == True:
                                 if not core.is_in_check(core.cur_turn):
@@ -70,12 +74,47 @@ def main():
                             core.flip_sides()                         
                             #animate_move(screen, board, clock, (row,col), selected_square, board[row][col])
                             #highlight_move(screen, selected_square, (row,col))
+                            played_move = (row,col)
+                            played_from = (selected_square[0], selected_square[1])
+                            if core.is_in_check(core.cur_turn):
+                                king = core.findKing(core.cur_turn)
+                                king_square =(king.row, king.col)
                     
                     selected_square = ()
-                     
-        draw_game_state(screen, board, selected_square, moves)
+            
+        draw_game_state(screen, board, selected_square, moves, played_move, played_from, king_square)
         clock.tick(MAX_FPS)
+        
         p.display.flip()
+
+
+def draw_game_state(screen, board, selected_square, moves, played_from, played_move, king_square):
+    draw_board(screen)
+    highlight_squares(screen, selected_square, moves, board)
+    highlight_played(screen, played_from, played_move)
+    highlight_check(screen, king_square)
+    draw_pieces(screen, board)
+
+def highlight_check(screen, king_square):
+    if king_square == ():
+        return
+    r, c = king_square
+    s = p.Surface((SQ_SIZE, SQ_SIZE))
+    s.set_alpha(100)
+    s.fill(p.Color('red'))
+    screen.blit(s, (c*SQ_SIZE, r*SQ_SIZE))
+
+def highlight_played(screen, played_move, played_from):
+    if (played_from == () or played_move == ()):
+        return
+    mover, movec = played_move
+    fromr, fromc = played_from
+    s = p.Surface((SQ_SIZE, SQ_SIZE))
+    s.set_alpha(100)
+    s.fill(p.Color('blue'))
+    screen.blit(s, (movec*SQ_SIZE, mover*SQ_SIZE))
+    s.fill(p.Color('blue'))
+    screen.blit(s, (fromc*SQ_SIZE, fromr*SQ_SIZE))
 
 
 # highlight sqaure selected and posibble moves
@@ -96,11 +135,6 @@ def highlight_squares(screen, selected_sq, moves, board):
             s.fill(p.Color(238, 29, 35))
         screen.blit(s, (c*SQ_SIZE, r*SQ_SIZE))
     
-
-def draw_game_state(screen, board, selected_square, moves):
-    draw_board(screen)
-    highlight_squares(screen, selected_square, moves, board)
-    draw_pieces(screen, board)
 
 def draw_board(screen):
     colors = [p.Color("white"), p.Color(254, 211, 169)]
