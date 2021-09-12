@@ -43,12 +43,11 @@ def main():
                 location = p.mouse.get_pos()
                 col = location[0]//SQ_SIZE
                 row = location[1]//SQ_SIZE
-                #print(core.cur_turn)
-                core.get_all_available_moves(core.cur_turn)
+                #core.get_all_available_moves(core.cur_turn)
                 if selected_square == (): #first click
                     if board[row][col] != "--" and board[row][col].colour == core.cur_turn: # only if i clicked on a piece i can move it        
                         selected_square = (row, col)   
-                        
+                        board[row][col].get_available_moves()  
                         if core.is_in_check(core.cur_turn):
                             print("hi")
                             # board[row][col].get_available_moves()
@@ -72,7 +71,8 @@ def main():
                             core.flip_sides()                         
                             #animate_move(screen, board, clock, (row,col), selected_square, board[row][col])
                             #highlight_move(screen, selected_square, (row,col))
-                    core.clear_available_moves()
+                    else:
+                        board[selected_square[0]][selected_square[1]].available_moves.clear() 
                             
                     
                     selected_square = ()

@@ -86,6 +86,7 @@ class Piece():
     def move_cap(self, target_row, target_col):
         
         curr_available_moves = copy.deepcopy(self.available_moves)
+        self.available_moves.clear()
         
         for i in curr_available_moves:
 
@@ -429,14 +430,11 @@ def clear_available_moves():
     
         
 def add_to_undo():  
-    copy_array = copy.deepcopy(chess_board)
+    copy_array = [[],[],[],[],[],[],[],[]]
+    for i in range(DIMENSION):
+        copy_array[i] = copy.deepcopy(chess_board[i])
 
-    for i in range(0,DIMENSION):
-        for j in range(0, DIMENSION):
-            copy_array[i][j] = copy.deepcopy(chess_board[i][j])
-    
     last_board_state.append(copy_array)
-    #print(chess_board)
 
 cur_turn = 'white'
 
@@ -449,12 +447,16 @@ def flip_sides():
 
 def undoMove():
     
-    global chess_board
-    copy_array = copy.deepcopy(last_board_state.pop())  
-    for i in range(0,DIMENSION):
-        for j in range(0, DIMENSION):
-            chess_board[i][j] = copy.deepcopy(copy_array[i][j])
-    
+    global chess_board 
+    global last_board_state
+    if (last_board_state == []): # if empty
+        return
+    print(chess_board)
+    print("\n")
+    print(last_board_state)
+    for i in range(DIMENSION):
+        chess_board[i] = copy.deepcopy(last_board_state[-1][i])   
+    last_board_state.pop()
     flip_sides()
   
     
