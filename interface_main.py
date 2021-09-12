@@ -31,7 +31,6 @@ def main():
     load_images()
     running = True
     selected_square = () # a tuple of selected square (row, column)
-    new_arr = []
     king_square = ()
     
 
@@ -51,18 +50,7 @@ def main():
                 if selected_square == (): #first click
                     if board[row][col] != "--" and board[row][col].colour == core.cur_turn: # only if i clicked on a piece i can move it        
                         selected_square = (row, col)   
-                        moves = board[row][col].get_available_moves()                
-                        print("moves are", moves)
-                          
-                        for move in moves: 
-                            if board[row][col].move_cap(move[0], move[1], moves) == True:
-                                if not core.is_in_check(core.cur_turn):
-                                    new_arr.append(move)  
-                                core.undoMove()
-                                core.flip_sides()
-                        moves = copy.deepcopy(new_arr)
-                        print("good moves are", moves)
-                        new_arr.clear()
+                        moves = core.get_moves_in_check(row, col)
                             
                                 
                                         
@@ -76,7 +64,11 @@ def main():
                             #highlight_move(screen, selected_square, (row,col))
                             played_move = (row,col)
                             played_from = (selected_square[0], selected_square[1])
+                            king_square = ()
                             if core.is_in_check(core.cur_turn):
+                                if core.is_checkmate(core.cur_turn):
+                                    print("checkmate")
+                                    checkmate_state(screen)
                                 king = core.findKing(core.cur_turn)
                                 king_square =(king.row, king.col)
                     
@@ -87,6 +79,9 @@ def main():
         
         p.display.flip()
 
+
+def checkmate_state(screen):
+    pass
 
 def draw_game_state(screen, board, selected_square, moves, played_from, played_move, king_square):
     draw_board(screen)

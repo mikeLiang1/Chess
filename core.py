@@ -412,14 +412,14 @@ def is_in_check(colour):
         all_moves = get_all_available_moves('black')
         for move in all_moves:          
             if move == (king.row, king.col): # a piece is checking my king
-                print("white king in check")
+               # print("white king in check")
                
                 return True
     else:
         all_moves = get_all_available_moves('white')
         for move in all_moves:
             if move == (king.row, king.col): # a piece is checking my king
-                print("black king in check")
+                #print("black king in check")
                
                 return True
     
@@ -439,6 +439,36 @@ def flip_sides():
         cur_turn = 'black'
     else:
         cur_turn = 'white'
+
+def get_moves_in_check(row, col):
+    new_arr = []
+    moves = chess_board[row][col].get_available_moves()                
+    #print("moves are", moves)  
+    for move in moves: 
+        if chess_board[row][col].move_cap(move[0], move[1], moves) == True:
+            if not is_in_check(cur_turn):
+                new_arr.append(move)  
+            undoMove()
+            flip_sides()
+    moves = copy.deepcopy(new_arr)
+    #print("good moves are", moves)
+    new_arr.clear()
+    return moves
+    
+
+def is_checkmate(colour):
+    all_arr = []
+    for i in range(0,DIMENSION):
+        for j in range(0,DIMENSION):
+            if chess_board[i][j] != EMPTY: 
+                if chess_board[i][j].colour == colour:
+                    all_arr.extend(get_moves_in_check(i, j))
+
+    print(all_arr)
+    if len(all_arr) == 0:
+        return True
+    return False
+
 
 def undoMove():
     
