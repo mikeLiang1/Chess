@@ -83,11 +83,10 @@ class Piece():
 
     # Loop through available moves list, if target square matches a tuple in available moves list, return move capture function
     # TODO: Changge move_cap function name
-    def move_cap(self, target_row, target_col):
+    def move_cap(self, target_row, target_col, possible_moves):
         
-        curr_available_moves = self.get_available_moves()
         
-        for i in curr_available_moves:
+        for i in possible_moves:
 
             if (target_row, target_col) == i:
 
@@ -95,7 +94,6 @@ class Piece():
                     return self.promote(target_row, target_col)
                 
                 if isinstance(self, King):
-                    print("king moving")
                     if target_row == self.row and target_col == 2:
                         self.castle(target_row, target_col, chess_board[self.row][self.col-4], 3)
                         return True
@@ -423,9 +421,9 @@ def is_in_check(colour):
     
     if colour == 'white':
         all_moves = get_all_available_moves('black')
-        
+        king = findKing(colour)
         for move in all_moves:          
-            if move == (wK.row, wK.col): # a piece is checking my king
+            if move == (king.row, king.col): # a piece is checking my king
                 print("white king in check")
                
                 return True
@@ -439,15 +437,6 @@ def is_in_check(colour):
                 return True
     
     return False
-
-def clear_available_moves():
-    
-    for piece in white_pieces:
-        piece.available_moves.clear()
-    
-    for piece in black_pieces:
-        piece.available_moves.clear()
-    
         
 def add_to_undo():  
     global last_board_state
@@ -472,9 +461,14 @@ def undoMove():
             chess_board[i][j] = copy.copy(last_board_state[i][j])
 
     flip_sides()
-  
-    
-    
+
+#find king on chessboard based on colour
+def findKing(colour):
+    for i in range(0,DIMENSION):
+        for j in range(0,DIMENSION):
+            if chess_board[i][j] != EMPTY: 
+                if chess_board[i][j].colour == colour and type(chess_board[i][j]) == King:
+                    return chess_board[i][j]
        
 
 # Creating all the pieces and placing them in their starting positions
@@ -514,10 +508,6 @@ wB2 = Bishop('white', 7, 5)
 wN2 = Knight('white', 7, 6)
 wR2 = Rook('white', 7, 7)
 
-
-black_pieces = [bR1, bN1, bB1, bQ, bK, bB2, bN2, bR2, bP1, bP2, bP3, bP4, bP5, bP6, bP7, bP8]
-
-white_pieces = [wR1, wN1, wB1, wQ, wK, wB2, wN2, wR2, wP1, wP2, wP3, wP4, wP5, wP6, wP7, wP8]
 
 # 8 by 8 2D array
 chess_board = [ 

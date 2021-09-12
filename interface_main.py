@@ -49,16 +49,15 @@ def main():
                     if board[row][col] != "--" and board[row][col].colour == core.cur_turn: # only if i clicked on a piece i can move it        
                         selected_square = (row, col)   
                         moves = board[row][col].get_available_moves()                
-                        
+                        print("moves are", moves)
                         for move in moves: 
-                            if board[row][col].move_cap(move[0], move[1]) == True:
+                            if board[row][col].move_cap(move[0], move[1], moves) == True:
                                 if not core.is_in_check(core.cur_turn):
-                                    print("move good ")
-                                    new_arr.append(move)
-                                    print(move)
+                                    new_arr.append(move)  
                                 core.undoMove()
                                 core.flip_sides()
                         moves = copy.deepcopy(new_arr)
+                        print("good moves are", moves)
                         new_arr.clear()
                             
                                 
@@ -66,7 +65,8 @@ def main():
                 else: #second click
                     if selected_square != (row,col):  # if didnt click same spot
                         #print("not clicked on smae sqaure")
-                        if board[selected_square[0]][selected_square[1]].move_cap(row, col) == True:  # if clicked on available move sqaure
+                        
+                        if board[selected_square[0]][selected_square[1]].move_cap(row, col, moves) == True:  # if clicked on available move sqaure
                             core.flip_sides()                         
                             #animate_move(screen, board, clock, (row,col), selected_square, board[row][col])
                             #highlight_move(screen, selected_square, (row,col))
