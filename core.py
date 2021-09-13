@@ -350,6 +350,7 @@ class King(Piece):
 
     def __init__(self, colour, row, col):
         super().__init__(colour, row, col)
+        self.in_check = False
 
     def get_available_moves(self):
 
@@ -367,17 +368,20 @@ class King(Piece):
 
                     self.empty_or_enemy(k_possible_row, k_possible_col)
                 
-                
-                if self.moved == False:
-                    if k_possible_row == self.row and k_possible_col == 6: #right side castle
-                        rook = chess_board[self.row][self.col+3]
-                        if chess_board[self.row][self.col + 1] == EMPTY and chess_board[self.row][self.col+2] == EMPTY and isinstance(rook, Rook) == True and rook.moved == False:
-                            self.available_moves.append((self.row,6))                       
-                    elif k_possible_row == self.row and k_possible_col == 2: #left side castle        
-                        rook = chess_board[self.row][self.col-4]
-                        if chess_board[self.row][self.col - 1] == EMPTY and chess_board[self.row][self.col-2] == EMPTY and chess_board[self.row][self.col-3] == EMPTY and \
-                        isinstance(rook, Rook) == True and rook.moved == False:    
-                            self.available_moves.append((self.row, 2))   
+                # is castling possible
+                if self.in_check == False:
+                    if self.moved == False:
+                        if k_possible_row == self.row and k_possible_col == 6: #right side castle
+                            rook = chess_board[self.row][self.col+3]
+                            if chess_board[self.row][self.col + 1] == EMPTY and chess_board[self.row][self.col+2] == EMPTY and isinstance(rook, Rook) == True:
+                                if rook.moved == False:  
+                                    self.available_moves.append((self.row,6))                       
+                        elif k_possible_row == self.row and k_possible_col == 2: #left side castle        
+                            rook = chess_board[self.row][self.col-4]
+                            if chess_board[self.row][self.col - 1] == EMPTY and chess_board[self.row][self.col-2] == EMPTY and chess_board[self.row][self.col-3] == EMPTY and \
+                            isinstance(rook, Rook) == True:
+                                if rook.moved == False:    
+                                    self.available_moves.append((self.row, 2))   
 
         copy_arr = copy.deepcopy(self.available_moves)
         self.available_moves.clear()
@@ -413,16 +417,16 @@ def is_in_check(colour):
         for move in all_moves:          
             if move == (king.row, king.col): # a piece is checking my king
                # print("white king in check")
-               
+                king.in_check = True
                 return True
     else:
         all_moves = get_all_available_moves('white')
         for move in all_moves:
             if move == (king.row, king.col): # a piece is checking my king
                 #print("black king in check")
-               
+                king.in_check = True
                 return True
-    
+    king.in_check = False
     return False
         
 def add_to_undo():  
