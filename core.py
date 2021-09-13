@@ -90,10 +90,10 @@ class Piece():
                     return self.promote(target_row, target_col)
                 
                 if isinstance(self, King):
-                    if target_row == self.row and target_col == 2:
+                    if target_row == self.row and target_col == 2 and self.moved == False and is_in_check(cur_turn) == False:
                         self.castle(target_row, target_col, chess_board[self.row][self.col-4], 3)
                         return True
-                    if target_row == self.row and target_col == 6:
+                    if target_row == self.row and target_col == 6 and self.moved == False and is_in_check(cur_turn) == False:
                         self.castle(target_row, target_col, chess_board[self.row][self.col+3], 5)
                         return True
 
@@ -376,7 +376,7 @@ class King(Piece):
                     elif k_possible_row == self.row and k_possible_col == 2: #left side castle        
                         rook = chess_board[self.row][self.col-4]
                         if chess_board[self.row][self.col - 1] == EMPTY and chess_board[self.row][self.col-2] == EMPTY and chess_board[self.row][self.col-3] == EMPTY and \
-                        isinstance(rook, Rook) == True and rook.moved == False:   
+                        isinstance(rook, Rook) == True and rook.moved == False:    
                             self.available_moves.append((self.row, 2))   
 
         copy_arr = copy.deepcopy(self.available_moves)
